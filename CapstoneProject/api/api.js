@@ -61,3 +61,20 @@ export const fetchSearchResults = async (query) => {
   );
   return handleResponse(response);
 };
+// Fetch Cast & Crew
+export const fetchCastAndCrew = async (id, mediaType) => {
+  const url = `${BASE_URL}/${mediaType}/${id}/credits?api_key=${API_KEY}`;
+  return await fetchData(url);
+};
+
+// Fetch Where to Watch (Streaming Providers)
+export const fetchWatchProviders = async (id, mediaType) => {
+  const url = `${BASE_URL}/${mediaType}/${id}/watch/providers?api_key=${API_KEY}`;
+  return await fetchData(url);
+};
+export const fetchMovieTrailer = async (id, mediaType) => {
+  const url = `${BASE_URL}/${mediaType}/${id}/videos?api_key=${API_KEY}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.results.find(video => video.type === "Trailer" && video.site === "YouTube") || null;
+};
