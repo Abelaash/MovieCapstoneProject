@@ -73,7 +73,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
       
       <View style={styles.movieInfoContainer}>
         <Text style={styles.title}>{movieDetails.title || movieDetails.name}</Text>
-        <Text style={styles.releaseDate}>{mediaType === 'movie' ? `Released: ${movieDetails.release_date}` : `First Air Date: ${movieDetails.first_air_date}`}</Text>
         <View style={styles.genreContainer}>
           {movieDetails.genres.map(genre => (
             <View key={genre.id} style={styles.genre}>
@@ -81,6 +80,9 @@ export default function MovieDetailsScreen({ route, navigation }) {
             </View>
           ))}
         </View>
+        <TouchableOpacity style={styles.watchlistButton}>
+          <Text style={styles.watchlistButtonText}>Add to Watchlist</Text>
+        </TouchableOpacity>
       </View>
       
       <View style={styles.rateContainer}>
@@ -124,20 +126,19 @@ const styles = StyleSheet.create({
   spotlightImage: { width: SCREEN_WIDTH, height: 250 },
   movieInfoContainer: { padding: 20, alignItems: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', color: '#FFFFFF' },
-  releaseDate: { fontSize: 16, color: '#A9A9A9' },
   genreContainer: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
   genre: { backgroundColor: '#FF6347', padding: 5, margin: 5, borderRadius: 5 },
   genreText: { color: '#FFFFFF' },
+  watchlistButton: { backgroundColor: '#FFD700', padding: 10, borderRadius: 5, marginTop: 10 },
+  watchlistButtonText: { fontWeight: 'bold', color: '#000' },
+  rateContainer: { alignItems: 'center', marginVertical: 20 },
+  starContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 10 },
+  detailsContainer: { padding: 20 },
+  detailsTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 10 },
+  descriptionText: { color: '#FFFFFF', fontSize: 16, lineHeight: 24 },
   castContainer: { padding: 20 },
   castCrewItem: { alignItems: 'center', marginRight: 15 },
   castImage: { width: 80, height: 80, borderRadius: 40 },
   castName: { color: '#FFFFFF', fontWeight: 'bold', marginTop: 5 },
-  characterName: { color: '#A9A9A9' },
-  rateContainer: { alignItems: 'center', marginVertical: 20 },
-  starContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 10 },
-  ratingTitle: { color: '#FFFFFF', textAlign: 'center', fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  detailsContainer: { padding: 20 },
-  detailsTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 10 },
-  descriptionText: { color: '#FFFFFF', fontSize: 16, lineHeight: 24 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  characterName: { color: '#A9A9A9' }
 });
