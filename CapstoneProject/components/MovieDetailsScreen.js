@@ -1,317 +1,144 @@
-import { useState, useRef } from 'react';
-import Header from './Header.js';
-import Footer from './Footer.js';
+import { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions, ActivityIndicator, Platform } from 'react-native';
+import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import NavBar from './NavigationBar'; 
-import { Video } from 'expo-av';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Dimensions
-} from 'react-native';
-const SCREEN_WIDTH = Dimensions.get("window").width;
+import { fetchMovieDetails, fetchTVDetails, fetchCastAndCrew, fetchWatchProviders, fetchMovieTrailer, fetchMovieReviews, fetchSimilarMovies } from '../api/api';
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
-export default function MovieDetailsScreen({route, navigation }){
-  const { item, mediaType } = route.params; 
-  console.log('item',item)
-  const scrollViewRef = useRef(null);
-  const descriptionRef = useRef(null);
-  const castCrewRef = useRef(null);
-  const reviewsRef = useRef(null);
-  const wheretoWatchRef = useRef(null);
-
-  const scrollToSection = (sectionRef) => {
-    const y = sectionRef.current.offsetTop; 
-    scrollViewRef.current.scrollTo({ x: 0, y, animated: true });
-  };
-
+export default function MovieDetailsScreen({ route, navigation }) {
+  const { item, mediaType } = route.params;
+  const [movieDetails, setMovieDetails] = useState(null);
+  const [castCrew, setCastCrew] = useState([]);
+  const [watchProviders, setWatchProviders] = useState([]);
+  const [trailer, setTrailer] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [similarMovies, setSimilarMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
 
-  const handlePress = (star) => {
-    setRating(star);
-  };
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const details = mediaType === 'movie' 
+          ? await fetchMovieDetails(item.id) 
+          : await fetchTVDetails(item.id);
+        setMovieDetails(details);
+        
+        const castData = await fetchCastAndCrew(item.id, mediaType);
+        setCastCrew(castData.cast || []);
+        
+        const watchData = await fetchWatchProviders(item.id, mediaType);
+        const countryCode = 'US'; 
+        const providers = watchData.results?.[countryCode]?.flatrate || [];
+        setWatchProviders(providers);
+        
+        const trailerData = await fetchMovieTrailer(item.id, mediaType);
+        setTrailer(trailerData);
+        
+        const reviewData = await fetchMovieReviews(item.id, mediaType);
+        setReviews(reviewData);
+        
+        const similarData = await fetchSimilarMovies(item.id, mediaType);
+        setSimilarMovies(similarData);
+      } catch (error) {
+        console.error('Error fetching details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetails();
+  }, [item.id, mediaType]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF6347" />
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={styles.container} ref={scrollViewRef}>
-
-        <View style={styles.spotlightSection}>
-          <Image
-              source={{
-                uri: `https://image.tmdb.org/t/p/original${item.backdrop_path}`,
-              }}
-              style={styles.spotlightImage}
-            />
+    <ScrollView style={styles.container}>
+      <Image source={{ uri: `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` }} style={styles.spotlightImage} />
+      
+      {trailer && Platform.OS !== 'web' ? (
+        <View style={styles.trailerContainer}>
+          <WebView style={styles.trailer} source={{ uri: `https://www.youtube.com/embed/${trailer.key}` }} />
         </View>
-        <View style={styles.movieInfoContainer}>
-          <View style={styles.upperContentContianer}>
-            <Text style={styles.boldFont}>{mediaType === 'movie'
-            ? `${item.title}`
-            : `${item.name}`}</Text>
-            <Text style={styles.subDescription}>
-              {mediaType === 'movie'
-                ? `Released: ${item.release_date.replace(/-/g, '/')}`
-                : `First Air Date: ${item.first_air_date.replace(/-/g, '/')}`}
-            </Text>
-            <View style={styles.genreContainer}>
-              {item.genres.map((genre) => (
-                <View key={genre.id} style={styles.genre}>
-                  <Text>{genre.name}</Text>
-                </View>
-              ))}
+      ) : Platform.OS === 'web' && trailer ? (
+        <TouchableOpacity onPress={() => window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank')}>
+          <Text style={styles.webWarning}>Watch the trailer on YouTube</Text>
+        </TouchableOpacity>
+      ) : null}
+      
+      <View style={styles.movieInfoContainer}>
+        <Text style={styles.title}>{movieDetails.title || movieDetails.name}</Text>
+        <View style={styles.genreContainer}>
+          {movieDetails.genres.map(genre => (
+            <View key={genre.id} style={styles.genre}>
+              <Text style={styles.genreText}>{genre.name}</Text>
             </View>
-          </View>
-          <View style={styles.lowerContentContianer}>
-            <Text style={styles.boldFont}>95%</Text>
-            <Text style={{ marginBottom: 5 }}>
-              matches with your preferences
-            </Text>
-            <Image
-              source={require('../assets/IMDb_rating.png')}
-              style={styles.ratingImage}
-            />
-            <TouchableOpacity style={styles.watchLaterButton}>
-              <Text style={{ fontWeight: 'bold' }}>Watch Later</Text>
+          ))}
+        </View>
+        <TouchableOpacity style={styles.watchlistButton}>
+          <Text style={styles.watchlistButtonText}>Add to Watchlist</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.rateContainer}>
+        <Text style={styles.ratingTitle}>Watched it? Rate it below!</Text>
+        <View style={styles.starContainer}>
+          {[1, 2, 3, 4, 5].map(star => (
+            <TouchableOpacity key={star} onPress={() => setRating(star)}>
+              <Icon name="star" size={40} color={star <= rating ? '#FFD700' : '#D3D3D3'} />
             </TouchableOpacity>
-          </View>
+          ))}
         </View>
-
-        <View style={styles.rateContainer}>
-          <Text>Watched it? Rate it below!</Text>
-          <View style={styles.starContainer}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <TouchableOpacity key={star} onPress={() => handlePress(star)}>
-                <Icon
-                  name="star"
-                  size={40}
-                  color={star <= rating ? '#FFE6BC' : '#ECEAEA'}
-                  style={styles.starStyle}
-                />
-              </TouchableOpacity>
+      </View>
+      
+      <View style={styles.detailsContainer}>
+        <Text style={styles.detailsTitle}>Description</Text>
+        <Text style={styles.descriptionText}>{movieDetails.overview}</Text>
+      </View>
+      
+      {castCrew.length > 0 && (
+        <View style={styles.castContainer}>
+          <Text style={styles.detailsTitle}>Top Cast</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {castCrew.map((person) => (
+              person.profile_path && (
+                <View key={person.id} style={styles.castCrewItem}>
+                  <Image source={{ uri: `https://image.tmdb.org/t/p/w185${person.profile_path}` }} style={styles.castImage} />
+                  <Text style={styles.castName}>{person.name}</Text>
+                  <Text style={styles.characterName}>{person.character}</Text>
+                </View>
+              )
             ))}
-          </View>
+          </ScrollView>
         </View>
-
-        <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          style={styles.horizontalButtonContainer}>
-          <TouchableOpacity
-            style={styles.horizontalButton}
-            onPress={() => scrollToSection(descriptionRef)}>
-            <Text>Description</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.horizontalButton}
-            onPress={() => scrollToSection(castCrewRef)}>
-            <Text>Cast & Crew</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.horizontalButton}
-            onPress={() => scrollToSection(wheretoWatchRef)}>
-            <Text>Where to Watch</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        <View style={styles.detailesContainer} ref={descriptionRef}>
-          <Text style={styles.detailsTitle}>Description</Text>
-          <Text>
-            {item.overview}
-          </Text>
-        </View>
-
-        <View style={styles.detailesContainer} ref={castCrewRef}>
-          <Text style={styles.detailsTitle}>Cast & Crew</Text>
-          <View style={styles.castCrewImageContainer}>
-            <Image
-              source={require('../assets/cast1.png')}
-              style={styles.thumbnail}
-            />
-            <Image
-              source={require('../assets/cast2.png')}
-              style={styles.thumbnail}
-            />
-            <Image
-              source={require('../assets/cast3.png')}
-              style={styles.thumbnail}
-            />
-            <Image
-              source={require('../assets/cast4.png')}
-              style={styles.thumbnail}
-            />
-            <Image
-              source={require('../assets/cast5.png')}
-              style={styles.thumbnail}
-            />
-            <Image
-              source={require('../assets/cast6.png')}
-              style={styles.thumbnail}
-            />
-          </View>
-        </View>
-
-        <View style={styles.detailesContainer} ref={wheretoWatchRef}>
-          <Text style={styles.detailsTitle}>Where to Watch</Text>
-          <View style={styles.platformImageContainer}>
-            <Image
-              source={require('../assets/wheretowatch1.png')}
-              style={styles.platformImage}
-            />
-            <Image
-              source={require('../assets/wheretowatch2.png')}
-              style={styles.platformImage}
-            />
-            <Image
-              source={require('../assets/wheretowatch3.png')}
-              style={styles.platformImage}
-            />
-            <Image
-              source={require('../assets/wheretowatch4.png')}
-              style={styles.platformImage}
-            />
-            <Image
-              source={require('../assets/wheretowatch5.png')}
-              style={styles.platformImage}
-            />
-            <Image
-              source={require('../assets/wheretowatch6.png')}
-              style={styles.platformImage}
-            />
-            <Image
-              source={require('../assets/wheretowatch7.png')}
-              style={styles.platformImage}
-            />
-          </View>
-        </View>
-      </ScrollView>
-      <NavBar navigation={navigation}/>
-    </View>
+      )}
+    </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  spotlightSection: {
-    width: SCREEN_WIDTH,
-    height: 200,
-    marginBottom: 20,
-  },
-  spotlightImage: {
-    width: "100%",
-    height: "100%",
-  },
-  movieInfoContainer: {
-    width: '90%',
-    marginHorizontal: 'auto',
-    marginVertical: 10,
-    backgroundColor: '#ECEAEA',
-    borderRadius: 5,
-  },
-  upperContentContianer: {
-    width: '90%',
-    marginHorizontal: 'auto',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ADA9A9',
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  boldFont: {
-    fontWeight: 'bold',
-  },
-  subDescription: {},
-  genreContainer: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-  },
-  genre: {
-    backgroundColor: 'white',
-    marginHorizontal: 5,
-    marginTop: 3,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 5,
-  },
-  lowerContentContianer: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  ratingImage: {
-    width: 70,
-    height: 30,
-    borderRadius: 5,
-  },
-  watchLaterButton: {
-    marginTop: 5,
-    backgroundColor: 'rgba(0, 174, 239, 0.55)',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-  },
-  horizontalButtonContainer: {
-    width: '90%',
-    marginHorizontal: 'auto',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  horizontalButton: {
-    backgroundColor: '#ECEAEA',
-    marginHorizontal: 5,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  rateContainer:{
-    borderBottomColor: '#D9D9D9',
-    borderBottomWidth: 1,
-    paddingVertical: 20,
-    width: '90%',
-    marginHorizontal: 'auto',
-  },
-  detailesContainer: {
-    borderTopColor: '#D9D9D9',
-    borderTopWidth: 1,
-    paddingVertical: 20,
-    width: '90%',
-    marginHorizontal: 'auto',
-  },
-  detailsTitle: {
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  castCrewImageContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  thumbnail: {
-    width: 80,
-    height: 100,
-    borderRadius: 4,
-  },
-  starContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  starStyle: {
-    width: 55,
-  },
-  platformImageContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 20,
-  },
-  platformImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 4,
-  },
+  container: { flex: 1, backgroundColor: '#121212' },
+  spotlightImage: { width: SCREEN_WIDTH, height: 250 },
+  movieInfoContainer: { padding: 20, alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#FFFFFF' },
+  genreContainer: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
+  genre: { backgroundColor: '#FF6347', padding: 5, margin: 5, borderRadius: 5 },
+  genreText: { color: '#FFFFFF' },
+  watchlistButton: { backgroundColor: '#FFD700', padding: 10, borderRadius: 5, marginTop: 10 },
+  watchlistButtonText: { fontWeight: 'bold', color: '#000' },
+  rateContainer: { alignItems: 'center', marginVertical: 20 },
+  starContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 10 },
+  detailsContainer: { padding: 20 },
+  detailsTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 10 },
+  descriptionText: { color: '#FFFFFF', fontSize: 16, lineHeight: 24 },
+  castContainer: { padding: 20 },
+  castCrewItem: { alignItems: 'center', marginRight: 15 },
+  castImage: { width: 80, height: 80, borderRadius: 40 },
+  castName: { color: '#FFFFFF', fontWeight: 'bold', marginTop: 5 },
+  characterName: { color: '#A9A9A9' }
 });
