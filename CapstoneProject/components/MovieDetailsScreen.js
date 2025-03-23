@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { fetchMovieDetails, fetchTVDetails, fetchCastAndCrew, fetchWatchProviders, fetchMovieTrailer, fetchMovieReviews, fetchSimilarMovies } from '../api/api';
 const SCREEN_WIDTH = Dimensions.get('window').width;
+import axios from 'axios';
 
 export default function MovieDetailsScreen({ route, navigation }) {
   const { item, mediaType } = route.params;
@@ -57,6 +58,30 @@ export default function MovieDetailsScreen({ route, navigation }) {
     );
   }
 
+  const handleAddToWatchlist = async () => {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/add-to-watchlist/', {
+            user_id: 1, 
+            movie_id: item.id,  
+        }, {
+            headers: {
+                // 'Authorization': `Bearer YOUR_ACCESS_TOKEN`, 
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 201) {
+            Alert.alert("Success", "Movie added to watchlist!");
+        } else if (response.status === 200) {
+            Alert.alert("Info", "Movie is already in the watchlist.");
+        }
+    } catch (error) {
+        console.error("Error adding to watchlist:", error);
+        Alert.alert("Error", "Failed to add movie to watchlist.");
+    }
+};
+
+
   return (
     <ScrollView style={styles.container}>
       <Image source={{ uri: `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` }} style={styles.spotlightImage} />
@@ -80,7 +105,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
             </View>
           ))}
         </View>
-        <TouchableOpacity style={styles.watchlistButton}>
+        <TouchableOpacity style={styles.watchlistButton} onPress={handleAddToWatchlist}>
           <Text style={styles.watchlistButtonText}>Add to Watchlist</Text>
         </TouchableOpacity>
       </View>

@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from backend.views import add_to_watchlist  
 
 urlpatterns = [
+    path('add-to-watchlist/', add_to_watchlist, name='add_to_watchlist'),
     path('admin/', admin.site.urls),
 ]

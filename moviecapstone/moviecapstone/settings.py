@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework',
     'backend'
 ]
 
@@ -49,7 +50,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'moviecapstone.urls'
 
@@ -77,8 +81,12 @@ WSGI_APPLICATION = 'moviecapstone.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'moviedb',  
+        'USER': 'admin',  
+        'PASSWORD': '71qwPQ!$%',  
+        'HOST': 'moviedb.cluster-ccjym2u2wfpq.us-east-1.rds.amazonaws.com',  
+        'PORT': '3306'  
     }
 }
 
