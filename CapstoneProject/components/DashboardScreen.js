@@ -23,21 +23,56 @@ const DashboardScreen = ({ navigation }) => {
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularTVShows, setPopularTVShows] = useState([]);
+  const [watchlistMovies, setWatchlistMovies] = useState([]);
+  const [watchlistTVShows, setWatchlistTVShows] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [upcoming, trending, popularTV] = await Promise.all([
+        const [upcoming, trending, popularTV, watchlistResponse] = await Promise.all([
           fetchUpcomingMovies(),
           fetchTrendingMovies(),
           fetchPopularTVShows(),
+          fetch('http://127.0.0.1:8000/watchlist/1', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }),
         ]);
 
         setUpcomingMovies(upcoming.results || []);
         setTrendingMovies(trending.results || []);
         setPopularTVShows(popularTV.results || []);
+        
+        const watchlistData = await watchlistResponse.json();
+
+        if (watchlistData.length > 0) {
+          const moviePromises = watchlistData.filter(item => item.media_type === 'movie').map(async (item) => {
+            return await fetchMovieDetails(item.movie_id);
+          });
+
+          const tvPromises = watchlistData.filter(item => item.media_type === 'tv').map(async (item) => {
+            return await fetchTVDetails(item.movie_id); // You might want to change movie_id to tv_id based on your API response
+          });
+
+          const [watchlistMoviesData, watchlistTVShowsData] = await Promise.all([
+            Promise.all(moviePromises),
+            Promise.all(tvPromises),
+          ]);
+
+          setWatchlistMovies(watchlistMoviesData);
+          setWatchlistTVShows(watchlistTVShowsData);
+        } else {
+          setWatchlistMovies([]);
+          setWatchlistTVShows([]);
+        }
+
+
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
       } finally {
@@ -108,6 +143,9 @@ const DashboardScreen = ({ navigation }) => {
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
             {renderSection("Upcoming Movies", upcomingMovies, "upcoming", "movie")}
             {renderSection("Popular TV Shows", popularTVShows, "popular", "tv")}
+            {watchlistMovies.length > 0 && renderSection("Watchlist Movies", watchlistMovies, "watchlist", "movie")}
+            {watchlistTVShows.length > 0 && renderSection("Watchlist TV Shows", watchlistTVShows, "watchlist", "tv")}
+
           </>
         )}
       </ScrollView>
