@@ -23,3 +23,16 @@ def add_to_watchlist(request):
     serializer = WatchlistSerializer(watchlist_entry)
 
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def watchlist(request, user_id):
+    # Query the watchlist for the specific user
+    watchlist_items = Watchlist.objects.filter(user_id=user_id)
+
+    # Serialize the data
+    serializer = WatchlistSerializer(watchlist_items, many=True)
+
+    # Return the serialized data as a response
+    return Response(serializer.data)
+
