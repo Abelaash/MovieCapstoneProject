@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Watchlist
 from .serializers import WatchlistSerializer
+from .recommender_engine import MovieRecommender
 
 @api_view(['POST'])
 def add_to_watchlist(request):
