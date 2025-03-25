@@ -7,21 +7,29 @@ from .recommender_engine import MovieRecommender
 
 @api_view(['POST'])
 def add_to_watchlist(request):
-    
-    user_id = request.data.get("user_id")  # Expect user_id from request
+    user_id = request.data.get("user_id")
     movie_id = request.data.get("movie_id")
+    movie_title = request.data.get("movie_title")  
+    poster_path = request.data.get("poster_path")
+    media_type = request.data.get("media_type")  # New field added
 
-    if not user_id or not movie_id:
-        return Response({"error": "user_id and movie_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+    if not all([user_id, movie_id, movie_title, poster_path, media_type]):
+        return Response({"error": "user_id, movie_id, movie_title, poster_path, and media_type are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if the movie is already in the watchlist
     if Watchlist.objects.filter(user_id=user_id, movie_id=movie_id).exists():
         return Response({"message": "Movie is already in the watchlist"}, status=status.HTTP_200_OK)
 
     # Add to watchlist
-    watchlist_entry = Watchlist.objects.create(user_id=user_id, movie_id=movie_id)
-    serializer = WatchlistSerializer(watchlist_entry)
+    watchlist_entry = Watchlist.objects.create(
+        user_id=user_id,
+        movie_id=movie_id,
+        movie_title=movie_title,
+        poster_path=poster_path,
+        media_type=media_type  # Save the media type in the database
+    )
 
+    serializer = WatchlistSerializer(watchlist_entry)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

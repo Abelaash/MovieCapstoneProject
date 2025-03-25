@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-)pn3tlc@l^x+&2y)rz%#hj^_@nd#*u5g%il#49c&#*i*kqn1bd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+]
 
 
 # Application definition
@@ -42,18 +45,33 @@ INSTALLED_APPS = [
     'backend'
 ]
 
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS",
+]
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8081",  # Allow requests from the frontend
+#     "http://127.0.0.1:8081",
+# ]
+
+
 
 ROOT_URLCONF = 'moviecapstone.urls'
 
@@ -83,12 +101,26 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'moviedb',  
-        'USER': 'admin',  
-        'PASSWORD': '71qwPQ!$%',  
-        'HOST': 'moviedb.cluster-ccjym2u2wfpq.us-east-1.rds.amazonaws.com',  
+        'USER': 'movieCapstone',  
+        'PASSWORD': '71etPQ!#$',  
+        'HOST': 'moviedb.ccjym2u2wfpq.us-east-1.rds.amazonaws.com',  
         'PORT': '3306'  
     }
 }
+
+
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 
 # Password validation

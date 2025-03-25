@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { fetchUpcomingMovies, fetchTrendingMovies, fetchPopularTVShows, fetchMovieDetails, fetchTVDetails } from "../api/api";
 import NavBar from "./NavigationBar";
+import axios from 'axios';
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
@@ -23,8 +24,9 @@ const DashboardScreen = ({ navigation }) => {
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularTVShows, setPopularTVShows] = useState([]);
-  const [watchlistMovies, setWatchlistMovies] = useState([]);
-  const [watchlistTVShows, setWatchlistTVShows] = useState([]);
+  const [watchlistMovie, setWatchlistMovie] = useState([]);
+  const [watchlistTV, setWatchlistTV] = useState([]);
+  
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,41 +39,21 @@ const DashboardScreen = ({ navigation }) => {
           fetchUpcomingMovies(),
           fetchTrendingMovies(),
           fetchPopularTVShows(),
-          fetch('http://127.0.0.1:8000/watchlist/1', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }),
+          axios.get('http://127.0.0.1:8000/watchlist/1'),
         ]);
 
         setUpcomingMovies(upcoming.results || []);
         setTrendingMovies(trending.results || []);
         setPopularTVShows(popularTV.results || []);
         
-        const watchlistData = await watchlistResponse.json();
+        const watchlistData = watchlistResponse.data;
+        console.log(watchlistData);
+        const movies = watchlistData.filter(item => item.media_type === "movie");
+        const tvShows = watchlistData.filter(item => item.media_type === "tv");
 
-        if (watchlistData.length > 0) {
-          const moviePromises = watchlistData.filter(item => item.media_type === 'movie').map(async (item) => {
-            return await fetchMovieDetails(item.movie_id);
-          });
-
-          const tvPromises = watchlistData.filter(item => item.media_type === 'tv').map(async (item) => {
-            return await fetchTVDetails(item.movie_id); // You might want to change movie_id to tv_id based on your API response
-          });
-
-          const [watchlistMoviesData, watchlistTVShowsData] = await Promise.all([
-            Promise.all(moviePromises),
-            Promise.all(tvPromises),
-          ]);
-
-          setWatchlistMovies(watchlistMoviesData);
-          setWatchlistTVShows(watchlistTVShowsData);
-        } else {
-          setWatchlistMovies([]);
-          setWatchlistTVShows([]);
-        }
-
+        // Set watchlist based on media type
+        setWatchlistMovie(movies);
+        setWatchlistTV(tvShows);
 
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
@@ -83,9 +65,12 @@ const DashboardScreen = ({ navigation }) => {
   }, []);
 
   const fetchDetails = async (id, mediaType) => {
+    console.log("ji")
+    console.log(mediaType)
     try {
       let details;
       if (mediaType === "tv") {
+        console.log("tv")
         details = await fetchTVDetails(id);
         navigation.navigate("Details", { item: details, mediaType: "tv" });
       } else if (mediaType === "movie") {
@@ -121,6 +106,30 @@ const DashboardScreen = ({ navigation }) => {
     </View>
   );
 
+  const renderWatchlist = (title, data, mediaType) => (
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <FlatList
+        data={data}
+        // keyExtractor={(item) => `${keyPrefix}-${item.movie_id}`}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() =>  fetchDetails(item.movie_id, mediaType)}>
+            <View style={styles.itemContainer}>
+              <Image
+                source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+                style={styles.posterImage}
+                resizeMode="cover"
+              />
+              <Text style={styles.itemTitle}>{item.movie_title}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      />
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -143,8 +152,8 @@ const DashboardScreen = ({ navigation }) => {
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
             {renderSection("Upcoming Movies", upcomingMovies, "upcoming", "movie")}
             {renderSection("Popular TV Shows", popularTVShows, "popular", "tv")}
-            {watchlistMovies.length > 0 && renderSection("Watchlist Movies", watchlistMovies, "watchlist", "movie")}
-            {watchlistTVShows.length > 0 && renderSection("Watchlist TV Shows", watchlistTVShows, "watchlist", "tv")}
+            {watchlistMovie.length > 0 && renderWatchlist("Watchlist Movies", watchlistMovie, "movie")}
+            {watchlistTV.length > 0 && renderWatchlist("Watchlist TV Shows", watchlistTV, "tv")}
 
           </>
         )}
