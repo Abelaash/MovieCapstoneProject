@@ -14,6 +14,7 @@ import {
 import { fetchUpcomingMovies, fetchTrendingMovies, fetchPopularTVShows, fetchMovieDetails, fetchTVDetails } from "../api/api";
 import NavBar from "./NavigationBar";
 import axios from 'axios';
+import { getRecommendations } from "../api/recommend";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
@@ -30,6 +31,9 @@ const DashboardScreen = ({ navigation }) => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [recommendations, setRecommendations] = useState([]);
+  const route = useRoute();
   
 
   useEffect(() => {
@@ -41,7 +45,7 @@ const DashboardScreen = ({ navigation }) => {
           fetchPopularTVShows(),
           axios.get('http://127.0.0.1:8000/watchlist/1'),
         ]);
-
+  
         setUpcomingMovies(upcoming.results || []);
         setTrendingMovies(trending.results || []);
         setPopularTVShows(popularTV.results || []);
@@ -57,11 +61,33 @@ const DashboardScreen = ({ navigation }) => {
 
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
-      } finally {
-        setLoading(false);
       }
     };
+  
+    const fetchRecommendations = async () => {
+      try {
+        const likedMovieIds = route.params?.likedMovieIds;
+  
+        if (likedMovieIds && likedMovieIds.length >= 5) {
+          const data = await getRecommendations(likedMovieIds); // { 550: [id1, id2, id3], ... }
+  
+          // Flatten all recommended IDs into a unique set
+          const recommendedIds = [...new Set(Object.values(data).flat())];
+  
+          // Fetch movie details for each recommended ID
+          const recommendedMovies = await Promise.all(
+            recommendedIds.map((id) => fetchMovieDetails(id))
+          );
+  
+          setRecommendations(recommendedMovies);
+        }
+      } catch (err) {
+        console.error("Failed to fetch recommendations:", err);
+      }
+    };
+  
     fetchData();
+    fetchRecommendations();
   }, []);
 
   const fetchDetails = async (id, mediaType) => {
@@ -143,6 +169,8 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         ) : (
           <>
+            {recommendations.length > 0 &&
+              renderSection("Recommended For You", recommendations, "recommend", "movie")}
             <View style={styles.heroContainer}>
               <Image
                 source={{ uri: trendingMovies[0]?.backdrop_path ? `https://image.tmdb.org/t/p/original${trendingMovies[0].backdrop_path}` : "https://via.placeholder.com/800x450" }}

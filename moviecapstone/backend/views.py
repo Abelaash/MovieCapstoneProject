@@ -44,3 +44,31 @@ def watchlist(request, user_id):
     # Return the serialized data as a response
     return Response(serializer.data)
 
+
+
+@api_view(['GET'])
+def watchlist(request, user_id):
+    # Query the watchlist for the specific user
+    watchlist_items = Watchlist.objects.filter(user_id=user_id)
+
+    # Serialize the data
+    serializer = WatchlistSerializer(watchlist_items, many=True)
+
+    # Return the serialized data as a response
+    return Response(serializer.data)
+
+
+# Instantiate recommender once globally
+recommender = MovieRecommender(api_key="your_tmdb_api_key")
+
+@api_view(["POST"])
+def recommend_movies_by_ids(request):
+    liked_ids = request.data.get("liked_ids", [])
+    if not liked_ids or len(liked_ids) < 5:
+        return Response({"error": "Please provide at least 5 liked movie IDs."}, status=400)
+    
+    try:
+        recommendations = recommender.recommend_for_ids(liked_ids)
+        return Response({"recommendations": recommendations})
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

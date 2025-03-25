@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path
 from backend.views import add_to_watchlist  
 from backend.views import watchlist 
+from backend.views import recommend_movies
 
 urlpatterns = [
     path('add-to-watchlist/', add_to_watchlist, name='add_to_watchlist'),
     path('watchlist/<int:user_id>/', watchlist, name='watchlist'),
     path('admin/', admin.site.urls),
+    
+    path("recommend/", recommend_movies),
 ]

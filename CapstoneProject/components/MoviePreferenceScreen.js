@@ -105,7 +105,8 @@ export default function MoviePreferenceScreen({ route, navigation }) {
               [{ text: 'OK' }]
             );
           } else {
-            navigation.navigate('Dashboard', { selectedMovies });
+            const likedMovieIds = selectedMovies.map(movie => movie.id);
+            navigation.navigate('Dashboard', { likedMovieIds });
           }
         }}
         disabled={selectedMovies.length < 5} // Disable button if less than 5 movies are selected
