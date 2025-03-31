@@ -15,6 +15,7 @@ import { fetchUpcomingMovies, fetchTrendingMovies, fetchPopularTVShows, fetchMov
 import NavBar from "./NavigationBar";
 import axios from 'axios';
 import { getRecommendations } from "../api/recommend";
+import { useRoute } from "@react-navigation/native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
@@ -64,6 +65,7 @@ const DashboardScreen = ({ navigation }) => {
       }
     };
   
+    // This is the method which receives the JSON from backend and the nfetches the details and shows it
     const fetchRecommendations = async () => {
       try {
         const likedMovieIds = route.params?.likedMovieIds;

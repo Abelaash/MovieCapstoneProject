@@ -59,8 +59,11 @@ def watchlist(request, user_id):
 
 
 # Instantiate recommender once globally
-recommender = MovieRecommender(api_key="your_tmdb_api_key")
+recommender = MovieRecommender(api_key="88b27e6ed4beb439aab05a195400d017")
 
+
+# Here the backend receives the request, then gets the recommendations by calling the right methods
+# after generating recommendations it sends the data back to the front end.  
 @api_view(["POST"])
 def recommend_movies_by_ids(request):
     liked_ids = request.data.get("liked_ids", [])
@@ -69,6 +72,6 @@ def recommend_movies_by_ids(request):
     
     try:
         recommendations = recommender.recommend_for_ids(liked_ids)
-        return Response({"recommendations": recommendations})
+        return Response({"recommendations": recommendations}) #JSON response sent to frontend
     except Exception as e:
         return Response({"error": str(e)}, status=500)
