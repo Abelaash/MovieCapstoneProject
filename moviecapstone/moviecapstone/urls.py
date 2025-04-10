@@ -23,6 +23,10 @@ urlpatterns = [
     path('watchlist/<int:user_id>/', watchlist, name='watchlist'),
     path('admin/', admin.site.urls),
     
+<<<<<<< Updated upstream
     path("recommend/", recommend_movies_by_ids),
     path("register/", register_user, name='register_user')
+=======
+    path("api/recommend/", recommend_movies_by_ids)
+>>>>>>> Stashed changes
 ]

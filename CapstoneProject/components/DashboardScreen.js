@@ -62,20 +62,28 @@ const DashboardScreen = ({ navigation }) => {
 
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
+      }finally {
+        setLoading(false);
       }
     };
+    fetchData();
+  
+    
   
     // This is the method which receives the JSON from backend and the nfetches the details and shows it
     const fetchRecommendations = async () => {
       try {
         const likedMovieIds = route.params?.likedMovieIds;
+        // const likedMovieIds = [550, 299536, 278, 424, 157336];
+        console.log("Liked movie IDs:", likedMovieIds);
   
         if (likedMovieIds && likedMovieIds.length >= 5) {
           const data = await getRecommendations(likedMovieIds); // { 550: [id1, id2, id3], ... }
-  
+          console.log("Backend response:", data);
+
           // Flatten all recommended IDs into a unique set
           const recommendedIds = [...new Set(Object.values(data).flat())];
-  
+          console.log("debug1:", recommendedIds);
           // Fetch movie details for each recommended ID
           const recommendedMovies = await Promise.all(
             recommendedIds.map((id) => fetchMovieDetails(id))
@@ -87,9 +95,15 @@ const DashboardScreen = ({ navigation }) => {
         console.error("Failed to fetch recommendations:", err);
       }
     };
-  
-    fetchData();
     fetchRecommendations();
+    
+    const runAll = async () => {
+      await fetchData();
+      await fetchRecommendations();
+      setLoading(false); //Ensure loading stops
+    };
+  
+    runAll();
   }, []);
 
   const fetchDetails = async (id, mediaType) => {
@@ -171,14 +185,14 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         ) : (
           <>
-            {recommendations.length > 0 &&
-              renderSection("Recommended For You", recommendations, "recommend", "movie")}
             <View style={styles.heroContainer}>
               <Image
                 source={{ uri: trendingMovies[0]?.backdrop_path ? `https://image.tmdb.org/t/p/original${trendingMovies[0].backdrop_path}` : "https://via.placeholder.com/800x450" }}
                 style={styles.heroImage}
               />
             </View>
+            {recommendations.length > 0 &&
+              renderSection("Recommended For You", recommendations, "recommend", "movie")}
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
             {renderSection("Upcoming Movies", upcomingMovies, "upcoming", "movie")}
             {renderSection("Popular TV Shows", popularTVShows, "popular", "tv")}
