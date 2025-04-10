@@ -14,3 +14,20 @@ class Watchlist(models.Model):
         db_table = 'watchlist'  # Table name as it exists in the database
         managed = False  # Tell Django not to create, delete, or modify the table
 
+
+class User(models.Model):
+    user_id = models.AutoField(primary_key=True)  
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150, blank=True, null=True)  
+    date_of_birth = models.DateField()
+    country = models.CharField(max_length=100)
+    username = models.CharField(max_length=150, unique=True)
+    password = models.CharField(max_length=128)
+    genre_id = models.IntegerField()
+
+    class Meta:
+        db_table = 'user'
+        managed = True
+
+    def __str__(self):
+        return self.username

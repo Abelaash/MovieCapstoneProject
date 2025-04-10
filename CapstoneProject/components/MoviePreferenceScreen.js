@@ -15,7 +15,7 @@ import { fetchMoviesByGenre } from '../api/api';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function MoviePreferenceScreen({ route, navigation }) {
-  const { genreId } = route.params; // Get the genreId passed from the previous screen
+  const { formData } = route.params;
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
   useEffect(() => {
     const loadMovies = async () => {
       try {
-        const data = await fetchMoviesByGenre(genreId);
+        const data = await fetchMoviesByGenre(formData.genreId);
         setMovies(data.results || []);
       } catch (error) {
         Alert.alert('Error', 'Failed to fetch movies. Please try again.');
@@ -33,7 +33,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
       }
     };
     loadMovies();
-  }, [genreId]);
+  }, [formData.genreId]);
 
   // Handle movie selection
   const handleMovieSelect = (movie) => {
@@ -63,6 +63,47 @@ export default function MoviePreferenceScreen({ route, navigation }) {
         </Text>
       </TouchableOpacity>
     );
+  };
+
+  const handleSubmit = async () => {
+    if (selectedMovies.length < 5) {
+      Alert.alert(
+        'Selection Incomplete',
+        'Please select at least 5 movies before generating recommendations.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    try {
+      const likedMovieIds = selectedMovies.map((movie) => movie.id);
+      const updatedFormData = {
+        ...formData,
+        likedMovieIds: likedMovieIds,
+      };
+
+      // const response = await fetch('https://your-api-endpoint.com/api/preferences', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(updatedFormData),
+      // });
+
+      // if (!response.ok) {
+      //   throw new Error('Failed to submit preferences');
+      // }
+
+      // const result = await response.json();
+      // console.log('Preferences submitted successfully:', result);
+
+      console.log(updatedFormData);
+
+      navigation.navigate('Dashboard', { userProfile: result });
+
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Something went wrong.');
+    }
   };
 
   return (
@@ -97,18 +138,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
           styles.recommendationButton,
           selectedMovies.length >= 5 ? {} : { opacity: 0.6 }, // Button enabled only when at least 5 movies are selected
         ]}
-        onPress={() => {
-          if (selectedMovies.length < 5) {
-            Alert.alert(
-              'Selection Incomplete',
-              'Please select at least 5 movies before generating recommendations.',
-              [{ text: 'OK' }]
-            );
-          } else {
-            const likedMovieIds = selectedMovies.map(movie => movie.id);
-            navigation.navigate('Dashboard', { likedMovieIds });
-          }
-        }}
+        onPress={handleSubmit}
         disabled={selectedMovies.length < 5} // Disable button if less than 5 movies are selected
       >
         <Text style={styles.recommendationButtonText}>

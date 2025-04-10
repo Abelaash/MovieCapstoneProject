@@ -1,9 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Watchlist
+from .models import Watchlist, User
 from .serializers import WatchlistSerializer
 from .recommender_engine import MovieRecommender
+from datetime import date
 
 @api_view(['POST'])
 def add_to_watchlist(request):
@@ -75,3 +76,59 @@ def recommend_movies_by_ids(request):
         return Response({"recommendations": recommendations}) #JSON response sent to frontend
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def register_user(request):
+    try:
+        data = request.data
+
+        dob = date(int(data['year']), int(data['month']), int(data['day']))
+
+        user = User.objects.create(
+            first_name=data['firstName'],
+            last_name=data.get('lastName', ''),
+            date_of_birth=dob,
+            country=data['country'],
+            username=data['username'],
+            password=data['password'],
+            genre_id=data['genreId']
+        )
+        
+        user_data = {
+            'user_id': user.user_id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'date_of_birth': str(user.date_of_birth),
+            'country': user.country,
+            'username': user.username,
+            'password': user.password,  
+            'genre_id': user.genre_id
+        }
+
+        return Response(user_data, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+# @api_view(['POST'])
+# def register_user(request):
+#     try:
+#         data = request.data
+
+#         # Extract and validate form fields
+#         dob = date(int(data['year']), int(data['month']), int(data['day']))
+
+#         user = User.objects.create(
+#             first_name=data['firstName'],
+#             last_name=data.get('lastName', ''),
+#             date_of_birth=dob,
+#             country=data['country'],
+#             username=data['username'],
+#             password=data['password'],
+#             genre_id=data['genreId']
+#         )
+
+#         return Response({'message': 'User registered successfully', 'user_id': user.user_id}, status=status.HTTP_201_CREATED)
+
+#     except Exception as e:
+#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
