@@ -101,7 +101,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
 
       console.log('Preferences submitted successfully:', result);
 
-      // navigation.navigate('Dashboard', { likedMovieIds });
+      navigation.navigate('Dashboard', { user_id: result.user.user_id });
 
     } catch (error) {
       Alert.alert('Error', error.message || 'Something went wrong.');

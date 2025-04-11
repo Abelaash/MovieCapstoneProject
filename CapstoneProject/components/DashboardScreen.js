@@ -35,7 +35,7 @@ const DashboardScreen = ({ navigation }) => {
 
   const [recommendations, setRecommendations] = useState([]);
   const route = useRoute();
-  
+  const { user_id } = route.params;
 
   useEffect(() => {
     const fetchData = async () => {

@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from backend.views import add_to_watchlist, register_user, recommend_movies_by_ids, watchlist
+from backend.views import add_to_watchlist, register_user, recommend_movies_by_ids, watchlist, login_user
 
 urlpatterns = [
     path('add-to-watchlist/', add_to_watchlist, name='add_to_watchlist'),
@@ -25,5 +25,6 @@ urlpatterns = [
     
     path("recommend/", recommend_movies_by_ids),
     path("register/", register_user, name='register_user'),
+    path("login/", login_user, name='login_user'),
     path("api/recommend/", recommend_movies_by_ids)
 ]
