@@ -82,29 +82,32 @@ export default function MoviePreferenceScreen({ route, navigation }) {
         likedMovieIds: likedMovieIds,
       };
 
-      // const response = await fetch('https://your-api-endpoint.com/api/preferences', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(updatedFormData),
-      // });
-
-      // if (!response.ok) {
-      //   throw new Error('Failed to submit preferences');
-      // }
-
-      // const result = await response.json();
-      // console.log('Preferences submitted successfully:', result);
-
       console.log(updatedFormData);
 
-      navigation.navigate('Dashboard', { userProfile: result });
+      const response = await fetch('http://127.0.0.1:8000/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // 🔥 Show the actual error message from Django
+        throw new Error(result.error || 'Failed to submit preferences');
+      }
+
+      console.log('Preferences submitted successfully:', result);
+
+      // navigation.navigate('Dashboard', { likedMovieIds });
 
     } catch (error) {
       Alert.alert('Error', error.message || 'Something went wrong.');
     }
   };
+
 
   return (
     <SafeAreaView style={styles.container}>

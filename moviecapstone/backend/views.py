@@ -5,6 +5,10 @@ from .models import Watchlist, User
 from .serializers import WatchlistSerializer
 from .recommender_engine import MovieRecommender
 from datetime import date
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
+from django.db import IntegrityError
+import json
 
 @api_view(['POST'])
 def add_to_watchlist(request):
@@ -81,8 +85,11 @@ def recommend_movies_by_ids(request):
 def register_user(request):
     try:
         data = request.data
-
         dob = date(int(data['year']), int(data['month']), int(data['day']))
+
+        # Check if the username already exists
+        if User.objects.filter(username=data['username']).exists():
+            return Response({'error': 'Username already taken'}, status=status.HTTP_409_CONFLICT)
 
         user = User.objects.create(
             first_name=data['firstName'],
@@ -90,45 +97,39 @@ def register_user(request):
             date_of_birth=dob,
             country=data['country'],
             username=data['username'],
-            password=data['password'],
-            genre_id=data['genreId']
+            password=make_password(data['password']),
+            liked_movie_ids=json.dumps(data['likedMovieIds'])  
         )
-        
-        user_data = {
-            'user_id': user.user_id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'date_of_birth': str(user.date_of_birth),
-            'country': user.country,
-            'username': user.username,
-            'password': user.password,  
-            'genre_id': user.genre_id
-        }
 
-        return Response(user_data, status=status.HTTP_201_CREATED)
+        return Response({
+            'message': 'User registered successfully',
+            'user': {
+                'user_id': user.user_id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'date_of_birth': str(user.date_of_birth),
+                'country': user.country,
+                'username': user.username,
+                'liked_movie_ids': json.loads(user.liked_movie_ids)
+            }
+        }, status=status.HTTP_201_CREATED)
 
+    except IntegrityError:
+        return Response({'error': 'Username must be unique'}, status=status.HTTP_409_CONFLICT)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
-# @api_view(['POST'])
-# def register_user(request):
-#     try:
-#         data = request.data
+@api_view(['POST'])
+def login_user(request):
+    data = request.data
+    username = data['username']
+    password = data['password']
 
-#         # Extract and validate form fields
-#         dob = date(int(data['year']), int(data['month']), int(data['day']))
-
-#         user = User.objects.create(
-#             first_name=data['firstName'],
-#             last_name=data.get('lastName', ''),
-#             date_of_birth=dob,
-#             country=data['country'],
-#             username=data['username'],
-#             password=data['password'],
-#             genre_id=data['genreId']
-#         )
-
-#         return Response({'message': 'User registered successfully', 'user_id': user.user_id}, status=status.HTTP_201_CREATED)
-
-#     except Exception as e:
-#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.get(username=username)
+        if check_password(password, user.password):
+            return Response({'message': 'Login successful', 'user_id': user.user_id})
+        else:
+            return Response({'error': 'Invalid credentials'}, status=401)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
