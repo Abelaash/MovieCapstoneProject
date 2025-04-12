@@ -36,7 +36,7 @@ export default function RegistrationScreen({ navigation }) {
     } else if (password !== retypePassword) {
       Alert.alert('Error', 'Passwords do not match.');
     } else {
-      navigation.navigate('Genre', { username });
+      navigation.navigate('Genre', { formData });
     }
   };
 

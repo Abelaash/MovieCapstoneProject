@@ -16,11 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from backend.views import add_to_watchlist  
-from backend.views import watchlist 
+from backend.views import add_to_watchlist, register_user, recommend_movies_by_ids, watchlist, login_user
 
 urlpatterns = [
     path('add-to-watchlist/', add_to_watchlist, name='add_to_watchlist'),
     path('watchlist/<int:user_id>/', watchlist, name='watchlist'),
     path('admin/', admin.site.urls),
+    
+    path("recommend/", recommend_movies_by_ids),
+    path("register/", register_user, name='register_user'),
+    path("login/", login_user, name='login_user'),
+    path("api/recommend/", recommend_movies_by_ids)
 ]

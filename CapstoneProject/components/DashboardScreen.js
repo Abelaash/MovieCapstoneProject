@@ -14,6 +14,8 @@ import {
 import { fetchUpcomingMovies, fetchTrendingMovies, fetchPopularTVShows, fetchMovieDetails, fetchTVDetails } from "../api/api";
 import NavBar from "./NavigationBar";
 import axios from 'axios';
+import { getRecommendations } from "../api/recommend";
+import { useRoute } from "@react-navigation/native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
@@ -30,7 +32,10 @@ const DashboardScreen = ({ navigation }) => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
+  const [recommendations, setRecommendations] = useState([]);
+  const route = useRoute();
+  const { user_id } = route.params;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +46,7 @@ const DashboardScreen = ({ navigation }) => {
           fetchPopularTVShows(),
           axios.get('http://127.0.0.1:8000/watchlist/1'),
         ]);
-
+  
         setUpcomingMovies(upcoming.results || []);
         setTrendingMovies(trending.results || []);
         setPopularTVShows(popularTV.results || []);
@@ -57,11 +62,48 @@ const DashboardScreen = ({ navigation }) => {
 
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
-      } finally {
+      }finally {
         setLoading(false);
       }
     };
     fetchData();
+  
+    
+  
+    // This is the method which receives the JSON from backend and the nfetches the details and shows it
+    const fetchRecommendations = async () => {
+      try {
+        const likedMovieIds = route.params?.likedMovieIds;
+        // const likedMovieIds = [550, 299536, 278, 424, 157336];
+        console.log("Liked movie IDs:", likedMovieIds);
+  
+        if (likedMovieIds && likedMovieIds.length >= 5) {
+          const data = await getRecommendations(likedMovieIds); // { 550: [id1, id2, id3], ... }
+          console.log("Backend response:", data);
+
+          // Flatten all recommended IDs into a unique set
+          const recommendedIds = [...new Set(Object.values(data).flat())];
+          console.log("debug1:", recommendedIds);
+          // Fetch movie details for each recommended ID
+          const recommendedMovies = await Promise.all(
+            recommendedIds.map((id) => fetchMovieDetails(id))
+          );
+  
+          setRecommendations(recommendedMovies);
+        }
+      } catch (err) {
+        console.error("Failed to fetch recommendations:", err);
+      }
+    };
+    fetchRecommendations();
+    
+    const runAll = async () => {
+      await fetchData();
+      await fetchRecommendations();
+      setLoading(false); //Ensure loading stops
+    };
+  
+    runAll();
   }, []);
 
   const fetchDetails = async (id, mediaType) => {
@@ -149,6 +191,8 @@ const DashboardScreen = ({ navigation }) => {
                 style={styles.heroImage}
               />
             </View>
+            {recommendations.length > 0 &&
+              renderSection("Recommended For You", recommendations, "recommend", "movie")}
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
             {renderSection("Upcoming Movies", upcomingMovies, "upcoming", "movie")}
             {renderSection("Popular TV Shows", popularTVShows, "popular", "tv")}

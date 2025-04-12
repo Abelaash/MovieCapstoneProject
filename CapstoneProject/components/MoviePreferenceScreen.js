@@ -15,7 +15,7 @@ import { fetchMoviesByGenre } from '../api/api';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function MoviePreferenceScreen({ route, navigation }) {
-  const { genreId } = route.params; // Get the genreId passed from the previous screen
+  const { formData } = route.params;
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
   useEffect(() => {
     const loadMovies = async () => {
       try {
-        const data = await fetchMoviesByGenre(genreId);
+        const data = await fetchMoviesByGenre(formData.genreId);
         setMovies(data.results || []);
       } catch (error) {
         Alert.alert('Error', 'Failed to fetch movies. Please try again.');
@@ -33,7 +33,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
       }
     };
     loadMovies();
-  }, [genreId]);
+  }, [formData.genreId]);
 
   // Handle movie selection
   const handleMovieSelect = (movie) => {
@@ -64,6 +64,50 @@ export default function MoviePreferenceScreen({ route, navigation }) {
       </TouchableOpacity>
     );
   };
+
+  const handleSubmit = async () => {
+    if (selectedMovies.length < 5) {
+      Alert.alert(
+        'Selection Incomplete',
+        'Please select at least 5 movies before generating recommendations.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    try {
+      const likedMovieIds = selectedMovies.map((movie) => movie.id);
+      const updatedFormData = {
+        ...formData,
+        likedMovieIds: likedMovieIds,
+      };
+
+      console.log(updatedFormData);
+
+      const response = await fetch('http://127.0.0.1:8000/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // 🔥 Show the actual error message from Django
+        throw new Error(result.error || 'Failed to submit preferences');
+      }
+
+      console.log('Preferences submitted successfully:', result);
+
+      navigation.navigate('Dashboard', { user_id: result.user.user_id });
+
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Something went wrong.');
+    }
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -97,17 +141,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
           styles.recommendationButton,
           selectedMovies.length >= 5 ? {} : { opacity: 0.6 }, // Button enabled only when at least 5 movies are selected
         ]}
-        onPress={() => {
-          if (selectedMovies.length < 5) {
-            Alert.alert(
-              'Selection Incomplete',
-              'Please select at least 5 movies before generating recommendations.',
-              [{ text: 'OK' }]
-            );
-          } else {
-            navigation.navigate('Dashboard', { selectedMovies });
-          }
-        }}
+        onPress={handleSubmit}
         disabled={selectedMovies.length < 5} // Disable button if less than 5 movies are selected
       >
         <Text style={styles.recommendationButtonText}>

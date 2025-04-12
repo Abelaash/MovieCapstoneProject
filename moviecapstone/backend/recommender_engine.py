@@ -44,6 +44,7 @@ class MovieRecommender:
             details = fetch_movie_details(movie_id, self.api_key)
             if details:
                 movie_data.append({
+                    "id": details.get("id"),
                     "title": details.get("title", ""),
                     "overview": details.get("overview", "")
                 })
@@ -56,13 +57,34 @@ class MovieRecommender:
         cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
         return tfidf_matrix, cosine_sim
 
-    def recommend(self, title, top_n=5):
-        indices = pd.Series(self.movie_data.index, index=self.movie_data['title']).drop_duplicates()
-        if title not in indices:
-            return []
-        idx = indices[title]
-        sim_scores = list(enumerate(self.cosine_sim[idx]))
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-        sim_scores = sim_scores[1:top_n+1]
-        movie_indices = [i[0] for i in sim_scores]
-        return self.movie_data['title'].iloc[movie_indices].tolist()
+    # def recommend(self, title, top_n=3):
+    #     indices = pd.Series(self.movie_data.index, index=self.movie_data['title']).drop_duplicates()
+    #     if title not in indices:
+    #         return []
+    #     idx = indices[title]
+    #     sim_scores = list(enumerate(self.cosine_sim[idx]))
+    #     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    #     sim_scores = sim_scores[1:top_n+1]
+    #     movie_indices = [i[0] for i in sim_scores]
+    #     return self.movie_data['title'].iloc[movie_indices].tolist()
+
+    def recommend_for_ids(self, liked_ids, top_n=3):
+            """
+            Takes a list of liked movie IDs and returns a dictionary of recommendations.
+            """
+            results = {}
+            id_index = pd.Series(self.movie_data.index, index=self.movie_data['id']).drop_duplicates()
+
+            for movie_id in liked_ids:
+                if movie_id not in id_index:
+                    continue
+
+                idx = id_index[movie_id]
+                sim_scores = list(enumerate(self.cosine_sim[idx]))
+                sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+                sim_scores = sim_scores[1:top_n+1]  # skip self
+
+                recommended_ids = [self.movie_data.iloc[i[0]]['id'] for i in sim_scores]
+                results[movie_id] = recommended_ids
+
+            return results

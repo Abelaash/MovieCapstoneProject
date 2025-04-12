@@ -13,16 +13,31 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (username === '' || password === '') {
       Alert.alert('Error', 'Please fill in both fields');
       return;
     }
 
-    if (username === 'user' && password === 'password') {
-      navigation.navigate('Dashboard');
-    } else {
-      Alert.alert('Error', 'Invalid username or password');
+    try {
+      const response = await fetch('http://127.0.0.1:8000/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Login failed');
+      }
+
+      navigation.navigate('Dashboard', { user_id: result.user_id });
+
+    } catch (error) {
+      Alert.alert('Login Failed', error.message || 'Something went wrong.');
     }
   };
 
@@ -32,7 +47,7 @@ export default function LoginScreen({ navigation }) {
 
       <View style={styles.loginBox}>
         <Text style={styles.loginText}>Login</Text>
-        
+
         <TextInput
           placeholder="Username"
           placeholderTextColor="#aaa"
@@ -40,7 +55,7 @@ export default function LoginScreen({ navigation }) {
           value={username}
           onChangeText={setUsername}
         />
-        
+
         <TextInput
           placeholder="Password"
           placeholderTextColor="#aaa"
