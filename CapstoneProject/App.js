@@ -48,9 +48,9 @@ export default function App() {
             <Stack.Screen name="MoviePreference" component={MoviePreferenceScreen} />
             <Stack.Screen name="Dashboard" component={DashboardScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
-            <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="Search" component={SearchScreen} />
             <Stack.Screen name="SearchResult" component={SearchResultScreen} options={{ headerShown: true }} />
-            <Stack.Screen name="Details" component={MovieDetailsScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="Details" component={MovieDetailsScreen} />
             <Stack.Screen name="AIChat" component={AIChatScreen} options={{ headerShown: true }} />
           </Stack.Navigator>
         </NavigationContainer>

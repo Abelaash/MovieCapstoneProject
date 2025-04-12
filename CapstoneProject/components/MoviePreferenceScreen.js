@@ -21,6 +21,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const { userId, setUserId } = useContext(UserContext);
+  const { likedMovies, setLikedMovies } = useContext(UserContext);
 
   // Fetch movies based on genre
   useEffect(() => {
@@ -106,6 +107,8 @@ export default function MoviePreferenceScreen({ route, navigation }) {
       console.log('user id', result.user.user_id);
 
       setUserId(result.user.user_id); 
+      setLikedMovies(result.user.liked_movie_ids)
+      
       setTimeout(() => {
         navigation.navigate('Dashboard');
       }, 200); 

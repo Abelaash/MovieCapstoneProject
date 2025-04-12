@@ -25,6 +25,7 @@ const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 5 : 2.5);
 
 const DashboardScreen = ({ navigation }) => {
   const { userId } = useContext(UserContext);
+  const { likedMovies} = useContext(UserContext);
   const [userName, setUserName] = useState("John");
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -76,12 +77,12 @@ const DashboardScreen = ({ navigation }) => {
     // This is the method which receives the JSON from backend and the nfetches the details and shows it
     const fetchRecommendations = async () => {
       try {
-        const likedMovieIds = route.params?.likedMovieIds;
+        // const likedMovieIds = route.params?.likedMovieIds;
         // const likedMovieIds = [550, 299536, 278, 424, 157336];
-        console.log("Liked movie IDs:", likedMovieIds);
-  
-        if (likedMovieIds && likedMovieIds.length >= 5) {
-          const data = await getRecommendations(likedMovieIds); // { 550: [id1, id2, id3], ... }
+        console.log("Liked movie IDs:", likedMovies);
+        
+        if (likedMovies && likedMovies.length >= 5) {
+          const data = await getRecommendations(likedMovies); // { 550: [id1, id2, id3], ... }
           console.log("Backend response:", data);
 
           // Flatten all recommended IDs into a unique set

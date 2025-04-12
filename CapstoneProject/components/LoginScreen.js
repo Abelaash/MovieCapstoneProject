@@ -15,6 +15,7 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
 
   const { userId, setUserId } = useContext(UserContext);
+  const { likedMovies, setLikedMovies} = useContext(UserContext);
 
   const handleLogin = async () => {
     if (username === '' || password === '') {
@@ -37,8 +38,13 @@ export default function LoginScreen({ navigation }) {
         throw new Error(result.error || 'Login failed');
       }
       
+      console.log('result', result);
       // set user id
-      setUserId(result.user_id);
+      setUserId(result.user.user_id);
+
+      // Set likedMovies
+      setLikedMovies();
+
       setTimeout(() => {
         navigation.navigate('Dashboard');
       }, 200); 

@@ -75,8 +75,9 @@ export default function MovieDetailsScreen({ route, navigation }) {
                 'Content-Type': 'application/json'
             }
         });
-
+        console.log('Watchlist added');
         if (response.status === 201) {
+          console.log('Watchlist added');
             Alert.alert("Success", "Movie added to watchlist!");
         } else if (response.status === 200) {
             Alert.alert("Info", "Movie is already in the watchlist.");
@@ -89,69 +90,71 @@ export default function MovieDetailsScreen({ route, navigation }) {
 
 
   return (
-    <ScrollView style={styles.container}>
-      <Image source={{ uri: `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` }} style={styles.spotlightImage} />
-      
-      {trailer && Platform.OS !== 'web' ? (
-        <View style={styles.trailerContainer}>
-          <WebView style={styles.trailer} source={{ uri: `https://www.youtube.com/embed/${trailer.key}` }} />
-        </View>
-      ) : Platform.OS === 'web' && trailer ? (
-        <TouchableOpacity onPress={() => window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank')}>
-          <Text style={styles.webWarning}>Watch the trailer on YouTube</Text>
-        </TouchableOpacity>
-      ) : null}
-      
-      <View style={styles.movieInfoContainer}>
-        <Text style={styles.title}>{movieDetails.title || movieDetails.name}</Text>
-        <View style={styles.genreContainer}>
-          {movieDetails.genres.map(genre => (
-            <View key={genre.id} style={styles.genre}>
-              <Text style={styles.genreText}>{genre.name}</Text>
-            </View>
-          ))}
-        </View>
-        <TouchableOpacity style={styles.watchlistButton} onPress={handleAddToWatchlist}>
-          <Text style={styles.watchlistButtonText}>Add to Watchlist</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.rateContainer}>
-        <Text style={styles.ratingTitle}>Watched it? Rate it below!</Text>
-        <View style={styles.starContainer}>
-          {[1, 2, 3, 4, 5].map(star => (
-            <TouchableOpacity key={star} onPress={() => setRating(star)}>
-              <Icon name="star" size={40} color={star <= rating ? '#FFD700' : '#D3D3D3'} />
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-      
-      <View style={styles.detailsContainer}>
-        <Text style={styles.detailsTitle}>Description</Text>
-        <Text style={styles.descriptionText}>{movieDetails.overview}</Text>
-      </View>
-      
-      {castCrew.length > 0 && (
-        <View style={styles.castContainer}>
-          <Text style={styles.detailsTitle}>Top Cast</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {castCrew.map((person) => (
-              person.profile_path && (
-                <View key={person.id} style={styles.castCrewItem}>
-                  <Image source={{ uri: `https://image.tmdb.org/t/p/w185${person.profile_path}` }} style={styles.castImage} />
-                  <Text style={styles.castName}>{person.name}</Text>
-                  <Text style={styles.characterName}>{person.character}</Text>
-                </View>
-              )
+    <View style={styles.container}>
+      <ScrollView >
+        <Image source={{ uri: `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` }} style={styles.spotlightImage} />
+        
+        {trailer && Platform.OS !== 'web' ? (
+          <View style={styles.trailerContainer}>
+            <WebView style={styles.trailer} source={{ uri: `https://www.youtube.com/embed/${trailer.key}` }} />
+          </View>
+        ) : Platform.OS === 'web' && trailer ? (
+          <TouchableOpacity onPress={() => window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank')}>
+            <Text style={styles.webWarning}>Watch the trailer on YouTube</Text>
+          </TouchableOpacity>
+        ) : null}
+        
+        <View style={styles.movieInfoContainer}>
+          <Text style={styles.title}>{movieDetails.title || movieDetails.name}</Text>
+          <View style={styles.genreContainer}>
+            {movieDetails.genres.map(genre => (
+              <View key={genre.id} style={styles.genre}>
+                <Text style={styles.genreText}>{genre.name}</Text>
+              </View>
             ))}
-          </ScrollView>
-
+          </View>
+          <TouchableOpacity style={styles.watchlistButton} onPress={handleAddToWatchlist}>
+            <Text style={styles.watchlistButtonText}>Add to Watchlist</Text>
+          </TouchableOpacity>
         </View>
-      )}
-      
-    </ScrollView>
-    
+        
+        <View style={styles.rateContainer}>
+          <Text style={styles.ratingTitle}>Watched it? Rate it below!</Text>
+          <View style={styles.starContainer}>
+            {[1, 2, 3, 4, 5].map(star => (
+              <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                <Icon name="star" size={40} color={star <= rating ? '#FFD700' : '#D3D3D3'} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+        
+        <View style={styles.detailsContainer}>
+          <Text style={styles.detailsTitle}>Description</Text>
+          <Text style={styles.descriptionText}>{movieDetails.overview}</Text>
+        </View>
+        
+        {castCrew.length > 0 && (
+          <View style={styles.castContainer}>
+            <Text style={styles.detailsTitle}>Top Cast</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {castCrew.map((person) => (
+                person.profile_path && (
+                  <View key={person.id} style={styles.castCrewItem}>
+                    <Image source={{ uri: `https://image.tmdb.org/t/p/w185${person.profile_path}` }} style={styles.castImage} />
+                    <Text style={styles.castName}>{person.name}</Text>
+                    <Text style={styles.characterName}>{person.character}</Text>
+                  </View>
+                )
+              ))}
+            </ScrollView>
+
+          </View>
+        )}
+        
+      </ScrollView>
+      <NavBar navigation={navigation}/>
+    </View>
   );
 }
 
