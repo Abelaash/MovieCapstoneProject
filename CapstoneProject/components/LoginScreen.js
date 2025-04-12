@@ -43,7 +43,7 @@ export default function LoginScreen({ navigation }) {
       setUserId(result.user.user_id);
 
       // Set likedMovies
-      setLikedMovies();
+      setLikedMovies(result.user.liked_movie_ids);
 
       setTimeout(() => {
         navigation.navigate('Dashboard');
