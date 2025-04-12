@@ -128,7 +128,11 @@ def login_user(request):
     try:
         user = User.objects.get(username=username)
         if check_password(password, user.password):
-            return Response({'message': 'Login successful', 'user_id': user.user_id})
+            return Response({
+                'message': 'Login successful',
+                'user_id': user.user_id,
+                'liked_movie_ids': json.loads(user.liked_movie_ids)
+            })
         else:
             return Response({'error': 'Invalid credentials'}, status=401)
     except User.DoesNotExist:
