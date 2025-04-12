@@ -14,6 +14,7 @@ import MovieDetailsScreen from './components/MovieDetailsScreen';
 import SearchResultScreen from './components/SearchResultScreen';
 import SearchScreen from './components/SearchScreen';
 import AIChatScreen from './components/AIChatScreen';
+import { UserProvider } from './components/UserContext';
 import 'react-native-reanimated';
 
 
@@ -33,25 +34,27 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="Splash" component={CustomSplashScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegistrationScreen} />
-          <Stack.Screen name="Genre" component={GenreSelectionScreen} />
-          <Stack.Screen name="MoviePreference" component={MoviePreferenceScreen} />
-          <Stack.Screen name="Dashboard" component={DashboardScreen} />
-          <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true }} />
-          <Stack.Screen name="SearchResult" component={SearchResultScreen} options={{ headerShown: true }} />
-          <Stack.Screen name="Details" component={MovieDetailsScreen} options={{ headerShown: true }} />
-          <Stack.Screen name="AIChat" component={AIChatScreen} options={{ headerShown: true }} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <UserProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="Splash" component={CustomSplashScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegistrationScreen} />
+            <Stack.Screen name="Genre" component={GenreSelectionScreen} />
+            <Stack.Screen name="MoviePreference" component={MoviePreferenceScreen} />
+            <Stack.Screen name="Dashboard" component={DashboardScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="SearchResult" component={SearchResultScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="Details" component={MovieDetailsScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="AIChat" component={AIChatScreen} options={{ headerShown: true }} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </UserProvider>
     </SafeAreaProvider>
   );
 }

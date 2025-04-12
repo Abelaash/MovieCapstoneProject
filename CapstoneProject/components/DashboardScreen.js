@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   ScrollView,
   Text,
@@ -16,12 +16,15 @@ import NavBar from "./NavigationBar";
 import axios from 'axios';
 import { getRecommendations } from "../api/recommend";
 import { useRoute } from "@react-navigation/native";
+import { UserContext } from './UserContext'; 
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
 const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 5 : 2.5);
 
+
 const DashboardScreen = ({ navigation }) => {
+  const { userId } = useContext(UserContext);
   const [userName, setUserName] = useState("John");
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -35,7 +38,7 @@ const DashboardScreen = ({ navigation }) => {
 
   const [recommendations, setRecommendations] = useState([]);
   const route = useRoute();
-  const { user_id } = route.params;
+  // const { user_id } = route.params;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +47,7 @@ const DashboardScreen = ({ navigation }) => {
           fetchUpcomingMovies(),
           fetchTrendingMovies(),
           fetchPopularTVShows(),
-          axios.get('http://127.0.0.1:8000/watchlist/1'),
+          axios.get(`http://127.0.0.1:8000/watchlist/${userId}`),
         ]);
   
         setUpcomingMovies(upcoming.results || []);
@@ -104,7 +107,7 @@ const DashboardScreen = ({ navigation }) => {
     };
   
     runAll();
-  }, []);
+  }, [userId]);
 
   const fetchDetails = async (id, mediaType) => {
     console.log("ji")
@@ -114,10 +117,10 @@ const DashboardScreen = ({ navigation }) => {
       if (mediaType === "tv") {
         console.log("tv")
         details = await fetchTVDetails(id);
-        navigation.navigate("Details", { item: details, mediaType: "tv" });
+        navigation.navigate("Details", { item: details, mediaType: "tv"});
       } else if (mediaType === "movie") {
         details = await fetchMovieDetails(id);
-        navigation.navigate("Details", { item: details, mediaType: "movie" });
+        navigation.navigate("Details", { item: details, mediaType: "movie"});
       }
     } catch (error) {
       console.error("Error fetching details:", error);
@@ -202,7 +205,7 @@ const DashboardScreen = ({ navigation }) => {
           </>
         )}
       </ScrollView>
-      <NavBar navigation={navigation} />
+      <NavBar navigation={navigation}/>
     </View>
   );
 };

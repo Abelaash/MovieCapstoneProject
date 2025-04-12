@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
+import { UserContext } from './UserContext';
 import {
   View,
   Text,
@@ -12,6 +13,8 @@ import {
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const { userId, setUserId } = useContext(UserContext);
 
   const handleLogin = async () => {
     if (username === '' || password === '') {
@@ -33,13 +36,24 @@ export default function LoginScreen({ navigation }) {
       if (!response.ok) {
         throw new Error(result.error || 'Login failed');
       }
-
-      navigation.navigate('Dashboard', { user_id: result.user_id });
+      
+      // set user id
+      setUserId(result.user_id);
+      setTimeout(() => {
+        navigation.navigate('Dashboard');
+      }, 200); 
+      // navigation.navigate('Dashboard', { user_id: result.user.user_id });
 
     } catch (error) {
       Alert.alert('Login Failed', error.message || 'Something went wrong.');
     }
   };
+
+  // useEffect(() => {
+  //     if (userId) {
+  //       navigation.navigate('Dashboard');
+  //     }
+  //   }, [userId]);
 
   return (
     <View style={styles.container}>

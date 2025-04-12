@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { UserContext } from './UserContext'
 import {
   View,
   Text,
@@ -19,6 +20,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { userId, setUserId } = useContext(UserContext);
 
   // Fetch movies based on genre
   useEffect(() => {
@@ -101,12 +103,27 @@ export default function MoviePreferenceScreen({ route, navigation }) {
 
       console.log('Preferences submitted successfully:', result);
 
-      navigation.navigate('Dashboard', { user_id: result.user.user_id });
+      console.log('user id', result.user.user_id);
+
+      setUserId(result.user.user_id); 
+      setTimeout(() => {
+        navigation.navigate('Dashboard');
+      }, 200); 
+
+      // navigation.navigate('Dashboard', { user_id: result.user.user_id });
 
     } catch (error) {
       Alert.alert('Error', error.message || 'Something went wrong.');
     }
   };
+
+  // useEffect(() => {
+    
+  //   if (userId) {
+  //     console.log('User ID changed to:', userId);
+  //     navigation.navigate('Dashboard');
+  //   }
+  // }, [userId]);
 
 
   return (

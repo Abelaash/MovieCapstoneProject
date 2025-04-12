@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions, ActivityIndicator, Platform } from 'react-native';
+import { useState, useEffect,useContext } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions, ActivityIndicator, Platform, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { fetchMovieDetails, fetchTVDetails, fetchCastAndCrew, fetchWatchProviders, fetchMovieTrailer, fetchMovieReviews, fetchSimilarMovies } from '../api/api';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 import axios from 'axios';
 import NavBar from './NavigationBar'; 
+import { UserContext } from './UserContext'; 
 
 export default function MovieDetailsScreen({ route, navigation }) {
   const { item, mediaType } = route.params;
@@ -17,6 +18,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
   const [similarMovies, setSimilarMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
+  const { userId } = useContext(UserContext);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -62,7 +64,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
   const handleAddToWatchlist = async () => {
     try {
         const response = await axios.post('http://127.0.0.1:8000/add-to-watchlist/', {
-            user_id: 1, 
+            user_id: userId, 
             movie_id: item.id,
             movie_title: item.name || item.title,
             poster_path: item.poster_path,
