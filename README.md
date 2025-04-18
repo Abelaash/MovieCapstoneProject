@@ -74,13 +74,6 @@ venv\Scripts\activate
 # On macOS/Linux
 source venv/bin/activate 
 
-# Install backend dependencies
-pip install -r requirements.txt
-
-# Run Django migrations
-python manage.py makemigrations
-python manage.py migrate
-
 # Start the Django server
 python manage.py runserver
 
