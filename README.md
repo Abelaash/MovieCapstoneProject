@@ -54,11 +54,29 @@ cd MovieCapstoneProject
 ```
 ### 2. 🌐 Frontend Setup (CapstoneProject folder)
 ```bash
+cd CapstoneProject
 # Install dependencies
 npm install
 
 # Start the server
 npm start
 ```
+### 3.  🐍 Backend Setup (MovieCapstone folder)
+```bash
+cd moviecapstone
+
+#Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Only on Windows
+
+# Install backend dependencies
+pip install -r backend/requirements.txt
+
+# Run Django migrations
+python manage.py makemigrations
+python manage.py migrate
+
+# Start the Django server
+python manage.py runserver
 
 
