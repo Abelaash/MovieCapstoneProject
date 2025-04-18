@@ -1,7 +1,8 @@
 # 📺 MovieCapstoneProject
 
 ## Welcome to the **MovieCapstoneProject** – a powerful movie recommendation system built for our final capstone! 🍿🎓  
-This project helps users discover new films based on preferences, trends, and intelligent algorithms.
+The goal of MovieCapstoneProject is to build an AI-powered, personalized recommendation system that enhances how users discover and interact with movie and TV content.
+
 
 ## ⚙️ Tech Stack
 
