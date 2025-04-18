@@ -43,5 +43,22 @@ MovieCapstoneProject/
 │   └── .gitignore              # 🚫 Files to ignore in version control
 
 └── README.md                   # 📘 Project documentation
+```
+## 🛠️ Installation
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/Abelaash/MovieCapstoneProject.git
+cd MovieCapstoneProject
+```
+### 2. 🌐 Frontend Setup (CapstoneProject folder)
+```bash
+# Install dependencies
+npm install
+
+# Start the server
+npm start
+```
 
 
