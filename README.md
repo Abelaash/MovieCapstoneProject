@@ -64,6 +64,8 @@ npm start
 ### 3.  🐍 Backend Setup (MovieCapstone folder)
 ```bash
 cd moviecapstone
+# Install django
+pip install django
 
 #Create and activate virtual environment
 python -m venv venv
@@ -72,7 +74,15 @@ python -m venv venv
 venv\Scripts\activate 
 
 # On macOS/Linux
-source venv/bin/activate 
+source venv/bin/activate
+
+# Install dependencies
+pip install django-cors-headers
+pip install djangorestframework
+pip install pymysql
+pip install requests
+pip install pandas
+pip install scikit-learn
 
 # Start the Django server
 python manage.py runserver
