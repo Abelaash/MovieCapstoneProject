@@ -67,10 +67,12 @@ cd moviecapstone
 
 #Create and activate virtual environment
 python -m venv venv
-source venv\Scripts\activate # On Windows
+
+# On Windows
+source venv\Scripts\activate 
 
 # On macOS/Linux
-source venv/bin/activate #
+source venv/bin/activate 
 
 # Install backend dependencies
 pip install -r backend/requirements.txt
