@@ -75,7 +75,7 @@ venv\Scripts\activate
 source venv/bin/activate 
 
 # Install backend dependencies
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 
 # Run Django migrations
 python manage.py makemigrations
