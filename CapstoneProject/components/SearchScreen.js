@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: 'black',
   },
   searchInput: {
     height: 50,
@@ -59,5 +59,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     marginBottom: 16,
+    backgroundColor: 'white',
   }
 });

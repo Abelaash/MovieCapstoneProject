@@ -44,10 +44,7 @@ const renderCard = (item, index, totalItems, navigation) => {
       ]}
       onPress={() => fetchDetails(item.id, item.media_type)} // Fetch details on clic
     >
-      <View style={styles.match}>
-        <Text style={styles.matchText}>90%</Text>{' '}
-        <Text style={styles.matchText}>Match</Text>
-      </View>
+      
       <Image
         source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
         style={styles.thumbnail}
@@ -98,7 +95,7 @@ export default function SearchResultScreen({ route, navigation }){
 
 
         <View style={styles.results}>
-          <Text style={styles.searchResult}>
+          <Text style={[styles.searchResult, { color: 'white' }]}>
             Search Results for: {searchQuery}
           </Text>
 
@@ -224,10 +221,12 @@ export default function SearchResultScreen({ route, navigation }){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'black',
+    color: 'white',
   },
   results: {
     padding: 16,
+    color:'white',
   },
   searchResult: {},
   sectionTitleContainer: {
@@ -235,6 +234,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 8,
+    color:'white',
   },
   verticalLine: {
     width: 1.5,
@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
     left: 8,
     top: 0.1,
     marginBottom: 8,
+    color:'white',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -258,11 +259,11 @@ const styles = StyleSheet.create({
   filterButton: {
     flex: 1,
     paddingVertical: 5,
-    backgroundColor: '#E9E7E7',
+    backgroundColor: 'white',
     alignItems: 'center',
   },
   activeFilter: {
-    backgroundColor: '#E1F8FF',
+    backgroundColor: 'rgb(0, 175, 239)',
   },
   filterText: {
     color: '#000',
@@ -278,8 +279,8 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   thumbnail: {
-    width: 50,
-    height: 60,
+    width: 70,
+    height: 100,
     borderRadius: 4,
     marginRight: 8,
   },
@@ -299,6 +300,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: 'bold',
+    color:'white',
   },
   moreButtonContainer: {
     flexDirection: 'row',
@@ -309,7 +311,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 3,
     borderRadius: 15,
-    backgroundColor: 'rgba(0, 174, 239, 0.55)',
+    backgroundColor: 'rgb(0, 175, 239)',
     width: 100,
     justifyContent: 'right',
   },
@@ -317,5 +319,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 10,
+    color:'white',
   },
 });

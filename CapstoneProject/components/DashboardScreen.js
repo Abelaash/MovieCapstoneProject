@@ -33,6 +33,7 @@ const DashboardScreen = ({ navigation }) => {
   const [watchlistMovie, setWatchlistMovie] = useState([]);
   const [watchlistTV, setWatchlistTV] = useState([]);
   
+  
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -159,7 +160,7 @@ const DashboardScreen = ({ navigation }) => {
         data={data}
         // keyExtractor={(item) => `${keyPrefix}-${item.movie_id}`}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() =>  fetchDetails(item.movie_id, mediaType)}>
+          <TouchableOpacity onPress={() =>  fetchDetails(item.movie_id, item.mediaType)}>
             <View style={styles.itemContainer}>
               <Image
                 source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
@@ -175,6 +176,12 @@ const DashboardScreen = ({ navigation }) => {
       />
     </View>
   );
+
+  const combinedWatchlist = [
+    ...watchlistMovie.map(item => ({ ...item, mediaType: 'movie' })),
+    ...watchlistTV.map(item => ({ ...item, mediaType: 'tv' })),
+  ];
+  
 
   return (
     <View style={styles.container}>
@@ -200,8 +207,7 @@ const DashboardScreen = ({ navigation }) => {
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
             {renderSection("Upcoming Movies", upcomingMovies, "upcoming", "movie")}
             {renderSection("Popular TV Shows", popularTVShows, "popular", "tv")}
-            {watchlistMovie.length > 0 && renderWatchlist("Watchlist Movies", watchlistMovie, "movie")}
-            {watchlistTV.length > 0 && renderWatchlist("Watchlist TV Shows", watchlistTV, "tv")}
+            {combinedWatchlist.length > 0 && renderWatchlist("Your Watchlist", combinedWatchlist)}
 
           </>
         )}

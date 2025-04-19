@@ -19,6 +19,8 @@ export default function MovieDetailsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
   const { userId } = useContext(UserContext);
+  const [watchlistMessage, setWatchlistMessage] = useState('');
+
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -78,13 +80,13 @@ export default function MovieDetailsScreen({ route, navigation }) {
         console.log('Watchlist added');
         if (response.status === 201) {
           console.log('Watchlist added');
-            Alert.alert("Success", "Movie added to watchlist!");
+          setWatchlistMessage('✅ Movie added to watchlist!');
         } else if (response.status === 200) {
-            Alert.alert("Info", "Movie is already in the watchlist.");
+          setWatchlistMessage('ℹ️ Movie is already in the watchlist.');
         }
     } catch (error) {
         console.error("Error adding to watchlist:", error);
-        Alert.alert("Error", "Failed to add movie to watchlist.");
+        setWatchlistMessage('❌ Failed to add movie to watchlist.');
     }
 };
 
@@ -116,6 +118,9 @@ export default function MovieDetailsScreen({ route, navigation }) {
           <TouchableOpacity style={styles.watchlistButton} onPress={handleAddToWatchlist}>
             <Text style={styles.watchlistButtonText}>Add to Watchlist</Text>
           </TouchableOpacity>
+          {watchlistMessage !== '' && (
+              <Text style={styles.feedbackMessage}>{watchlistMessage}</Text>
+            )}
         </View>
         
         <View style={styles.rateContainer}>
@@ -137,7 +142,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
         {castCrew.length > 0 && (
           <View style={styles.castContainer}>
             <Text style={styles.detailsTitle}>Top Cast</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.castList}>
               {castCrew.map((person) => (
                 person.profile_path && (
                   <View key={person.id} style={styles.castCrewItem}>
@@ -147,7 +152,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
                   </View>
                 )
               ))}
-            </ScrollView>
+            </View>
 
           </View>
         )}
@@ -173,9 +178,16 @@ const styles = StyleSheet.create({
   detailsContainer: { padding: 20 },
   detailsTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 10 },
   descriptionText: { color: '#FFFFFF', fontSize: 16, lineHeight: 24 },
-  castContainer: { padding: 20 },
-  castCrewItem: { alignItems: 'center', marginRight: 15 },
+  castContainer: { padding: 20},
+  castList: {display:'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap:20 },
+  castCrewItem: { alignItems: 'center', width:'25%' },
   castImage: { width: 80, height: 80, borderRadius: 40 },
-  castName: { color: '#FFFFFF', fontWeight: 'bold', marginTop: 5 },
-  characterName: { color: '#A9A9A9' }
+  castName: { color: '#FFFFFF', fontWeight: 'bold', marginTop: 5, textAlign:'center' },
+  characterName: { color: '#A9A9A9' },
+  feedbackMessage: {
+    marginTop: 8,
+    color: 'white', 
+    textAlign: 'center',
+    fontSize: 14,
+  }
 });
