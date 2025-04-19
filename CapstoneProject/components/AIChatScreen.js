@@ -9,11 +9,17 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import Markdown from 'react-native-markdown-display';
+
 
 const AIChatScreen = () => {
   const navigation = useNavigation();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const BACKEND_URL = "http://127.0.0.1:8000/chatbot/"; 
 
   const genres = [
     'Action',
@@ -28,34 +34,61 @@ const AIChatScreen = () => {
     'Romance',
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === '') return;
     const newMessage = { type: 'user', text: input };
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setInput('');
+    setIsLoading(true);
 
-    // Simulate an AI response
-    setTimeout(() => {
-      const aiResponse = {
-        type: 'ai',
-        text: `You asked about: "${input}". Here's what I found!`,
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
+      try {
+        const response = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: input }),
+        });
+      
+        const data = await response.json();
+        const aiResponse = { type: 'ai', text: data.reply || "Sorry, I couldn't understand that." };
+        setMessages((prev) => [...prev, aiResponse]);
+      } catch (error) {
+          const aiResponse = { type: 'ai', text: "There was an error talking to Panda AI." };
+          setMessages((prev) => [...prev, aiResponse]);
+      } finally {
+          setIsLoading(false);
+      }
   };
 
-  const handlePromptClick = (genre) => {
-    const newMessage = { type: 'user', text: genre };
+  const handlePromptClick = async (genre) => {
+    const prompt = `Can you recommend some good ${genre} movies?`;
+    const newMessage = { type: 'user', text: prompt };
     setMessages([...messages, newMessage]);
+    setIsLoading(true); // start loading
 
-    // Simulate an AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prompt }),
+      });
+  
+      const data = await response.json();
       const aiResponse = {
         type: 'ai',
-        text: `Looking into "${genre}" movies and shows for you!`,
+        text: data.reply || "Sorry, I couldn't find recommendations.",
       };
       setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
+    } catch (error) {
+      const aiResponse = {
+        type: 'ai',
+        text: "There was an error retrieving movie recommendations.",
+      };
+      setMessages((prev) => [...prev, aiResponse]);
+    } finally {
+      setIsLoading(false); // stop loading
+    }
   };
 
   const renderMessage = ({ item }) => (
@@ -64,7 +97,11 @@ const AIChatScreen = () => {
         styles.messageContainer,
         item.type === 'user' ? styles.userMessage : styles.aiMessage,
       ]}>
-      <Text style={styles.messageText}>{item.text}</Text>
+      {item.type === 'ai' ? (
+          <Markdown>{item.text}</Markdown>
+        ) : (
+          <Text style={styles.messageText}>{item.text}</Text>
+        )}
     </View>
   );
 
@@ -93,6 +130,11 @@ const AIChatScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Panda AI is typing...</Text>
+        </View>
+      )}
       <FlatList
         data={messages}
         renderItem={renderMessage}
@@ -213,6 +255,14 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  loadingText: {
+    fontStyle: 'italic',
+    color: '#666',
   },
 });
 

@@ -1,3 +1,4 @@
+import google.generativeai as genai
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -139,3 +140,37 @@ def login_user(request):
             return Response({'error': 'Invalid credentials'}, status=401)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
+
+
+# AI chat bot functionality
+genai.configure(api_key="AIzaSyDO0Tg6ZX7ij1S6bBzL6aGe2Zz5k4bbb3o")
+
+chat_sessions = {}  # In-memory store (temp solution)
+
+@api_view(["POST"])
+def chat_with_gemini(request):
+    message = request.data.get("message", "")
+    session_id = request.data.get("user_id")  # This user id thing does not work
+
+    if not message:
+        return Response({"error": "No message provided."}, status=400)
+
+    # System instructions (prompt engineering)
+    system_prompt = (
+        "You are PandaAI, a friendly and knowledgeable movie expert who works for Panda Picks — "
+        "a non fictional/real movie recommendation app. Your job is to help users with anything related to movies and TV shows. "
+        "Only answer questions that are related to movies, actors, directors, genres, plots, recommendations, "
+        "or movie trivia. If the question is not related to movies, respond politely and inform them that you can "
+        "only answer movie-related questions as part of your role at Panda Picks. Respond with the Panda Picks tone — helpful, modern, and fun."
+    )
+
+    if session_id not in chat_sessions:
+        chat_sessions[session_id] = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=system_prompt).start_chat()
+
+    chat = chat_sessions[session_id]
+
+    try:
+        response = chat.send_message(message)
+        return Response({"reply": response.text})
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
