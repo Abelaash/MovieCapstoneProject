@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { fetchMoviesByGenre } from '../api/api';
 import { Ionicons } from '@expo/vector-icons';
+import { Dimensions } from 'react-native';
 
 export default function MoviePreferenceScreen({ route, navigation }) {
   const { formData } = route.params;
@@ -22,6 +23,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const { userId, setUserId } = useContext(UserContext);
   const { likedMovies, setLikedMovies } = useContext(UserContext);
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
 
   // Fetch movies based on genre
   useEffect(() => {
@@ -38,6 +40,19 @@ export default function MoviePreferenceScreen({ route, navigation }) {
     loadMovies();
   }, [formData.genreId]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const { width } = Dimensions.get('window');
+      setScreenWidth(width);
+    };
+
+    const subscription = Dimensions.addEventListener('change', handleResize);
+
+    return () => {
+      subscription?.remove?.(); // Cleanup listener
+    };
+  }, []);
+
   // Handle movie selection
   const handleMovieSelect = (movie) => {
     const isSelected = selectedMovies.some((item) => item.id === movie.id);
@@ -50,12 +65,18 @@ export default function MoviePreferenceScreen({ route, navigation }) {
     }
   };
 
+  const cardWidth = screenWidth > 600 ? screenWidth / 4 - 30 : screenWidth / 2 - 30;
+
   // Render each movie as a selectable card
   const renderMovie = ({ item }) => {
     const isSelected = selectedMovies.some((movie) => movie.id === item.id);
     return (
       <TouchableOpacity
-        style={[styles.movieCard, isSelected && styles.selectedCard]}
+        style={[
+          styles.movieCard,
+          { width: cardWidth },
+          isSelected && styles.selectedCard,
+        ]}
         onPress={() => handleMovieSelect(item)}>
         <Image
           source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
@@ -106,12 +127,12 @@ export default function MoviePreferenceScreen({ route, navigation }) {
 
       console.log('user id', result.user.user_id);
 
-      setUserId(result.user.user_id); 
+      setUserId(result.user.user_id);
       setLikedMovies(result.user.liked_movie_ids)
-      
+
       setTimeout(() => {
         navigation.navigate('Dashboard');
-      }, 200); 
+      }, 200);
 
       // navigation.navigate('Dashboard', { user_id: result.user.user_id });
 
@@ -121,7 +142,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
   };
 
   // useEffect(() => {
-    
+
   //   if (userId) {
   //     console.log('User ID changed to:', userId);
   //     navigation.navigate('Dashboard');
@@ -135,6 +156,7 @@ export default function MoviePreferenceScreen({ route, navigation }) {
       <View style={styles.header}>
         <Ionicons
           name="arrow-back-outline"
+          color="red"
           size={24}
           onPress={() => navigation.goBack()}
         />
@@ -175,40 +197,41 @@ export default function MoviePreferenceScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: '#000',
     paddingTop: StatusBar.currentHeight,
   },
   header: {
-    flexDirection: 'row', // Align children horizontally (row direction)
-    alignItems: 'center', // Vertically center the items
+    flexDirection: 'row', 
+    alignItems: 'center', 
     paddingVertical: 20,
     paddingHorizontal: 15,
-    backgroundColor: '#FFE0B2',
+    backgroundColor: '#1a1a1a',
   },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ff0000',
     textAlign: 'center',
-    flex: 1, // Optional: ensures the text takes available space (can be useful for larger headers)
+    flex: 1, 
   },
   flatListContent: {
     paddingHorizontal: 10,
     paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   movieCard: {
-    flex: 1,
+    width: 280,
     alignItems: 'center',
     margin: 10,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1a1a', 
     borderWidth: 1,
     borderColor: '#ddd',
-    width: 150,
   },
   selectedCard: {
-    borderColor: '#87CEEB',
+    borderColor: '#ff0000',
     borderWidth: 2,
   },
   movieImage: {
@@ -221,6 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
+    color: '#fff'
   },
   // buttonContainer: {
   //   flex: 1,
@@ -243,7 +267,7 @@ const styles = StyleSheet.create({
   // },
   recommendationButton: {
     height: 50,
-    backgroundColor: '#87CEEB',
+    backgroundColor: '#ff0000', 
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',

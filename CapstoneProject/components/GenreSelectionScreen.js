@@ -9,6 +9,7 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const genres = [
   {
@@ -83,6 +84,12 @@ export default function GenreSelectionScreen({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <Ionicons
+          name="arrow-back-outline"
+          color="red"
+          size={24}
+          onPress={() => navigation.goBack()}
+        />
         <Text style={styles.title}>Pick your favorite genre!</Text>
       </View>
 
@@ -100,21 +107,22 @@ export default function GenreSelectionScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#000',
     paddingTop: StatusBar.currentHeight,
   },
   header: {
-    width: '100%',
-    backgroundColor: '#FFE0B2',
-    paddingVertical: 30,
-    alignItems: 'center',
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    backgroundColor: '#1a1a1a',
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ff0000',
+    textAlign: 'center',
+    flex: 1, 
   },
   flatListContent: {
     justifyContent: 'center',
@@ -131,11 +139,12 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 60,
     marginBottom: 10,
-    backgroundColor: '#ccc',
+    backgroundColor: '#333',
   },
   genreText: {
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
+    color: '#fff',
   },
 });

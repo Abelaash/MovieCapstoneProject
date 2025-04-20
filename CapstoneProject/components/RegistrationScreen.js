@@ -54,20 +54,20 @@ export default function RegistrationScreen({ navigation }) {
         <Image source={require('../assets/logo.png')} style={styles.logo} />
         <Text style={styles.title}>Create Your Account</Text>
 
-        <TextInput placeholder="First Name" style={styles.input} onChangeText={(text) => handleChange('firstName', text)} />
-        <TextInput placeholder="Last Name (optional)" style={styles.input} onChangeText={(text) => handleChange('lastName', text)} />
+        <TextInput placeholder="First Name" placeholderTextColor="#888" style={styles.input} onChangeText={(text) => handleChange('firstName', text)} />
+        <TextInput placeholder="Last Name (optional)" placeholderTextColor="#888" style={styles.input} onChangeText={(text) => handleChange('lastName', text)} />
 
         <Text style={styles.label}>Date of Birth</Text>
         <View style={styles.rowContainer}>
-          <TextInput placeholder="DD" style={styles.smallInput} keyboardType="numeric" onChangeText={(text) => handleChange('day', text)} />
-          <TextInput placeholder="MM" style={styles.smallInput} keyboardType="numeric" onChangeText={(text) => handleChange('month', text)} />
-          <TextInput placeholder="YYYY" style={styles.smallInput} keyboardType="numeric" onChangeText={(text) => handleChange('year', text)} />
+          <TextInput placeholder="DD" placeholderTextColor="#888" style={styles.smallInput} keyboardType="numeric" onChangeText={(text) => handleChange('day', text)} />
+          <TextInput placeholder="MM" placeholderTextColor="#888" style={styles.smallInput} keyboardType="numeric" onChangeText={(text) => handleChange('month', text)} />
+          <TextInput placeholder="YYYY" placeholderTextColor="#888" style={styles.smallInput} keyboardType="numeric" onChangeText={(text) => handleChange('year', text)} />
         </View>
 
-        <TextInput placeholder="Country" style={styles.input} onChangeText={(text) => handleChange('country', text)} />
-        <TextInput placeholder="Username" style={styles.input} onChangeText={(text) => handleChange('username', text)} />
-        <TextInput placeholder="Create Password" secureTextEntry style={styles.input} onChangeText={(text) => handleChange('password', text)} />
-        <TextInput placeholder="Retype Password" secureTextEntry style={styles.input} onChangeText={(text) => handleChange('retypePassword', text)} />
+        <TextInput placeholder="Country" placeholderTextColor="#888" style={styles.input} onChangeText={(text) => handleChange('country', text)} />
+        <TextInput placeholder="Username" placeholderTextColor="#888" style={styles.input} onChangeText={(text) => handleChange('username', text)} />
+        <TextInput placeholder="Create Password" placeholderTextColor="#888" secureTextEntry style={styles.input} onChangeText={(text) => handleChange('password', text)} />
+        <TextInput placeholder="Retype Password" placeholderTextColor="#888" secureTextEntry style={styles.input} onChangeText={(text) => handleChange('retypePassword', text)} />
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Register</Text>
