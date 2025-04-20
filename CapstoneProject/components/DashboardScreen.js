@@ -174,7 +174,7 @@ const DashboardScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView contentContainerStyle={{ paddingTop: 10, paddingBottom: 80 }}>
         {loading ? (
           <View style={styles.loading}>
             <ActivityIndicator size="large" color="#fff" />
@@ -185,8 +185,10 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         ) : (
           <>
-            {/* Hero Image with Text Overlay */}
-            <View style={styles.heroContainer}>
+            <TouchableOpacity
+              onPress={() => fetchDetails(trendingMovies[0].id, "movie")}
+              style={styles.heroContainer}
+            >
               <Image
                 source={{
                   uri: trendingMovies[0]?.backdrop_path
@@ -194,14 +196,14 @@ const DashboardScreen = ({ navigation }) => {
                     : "https://via.placeholder.com/800x450",
                 }}
                 style={styles.heroImage}
+                resizeMode="cover"
               />
               <View style={styles.heroOverlay}>
-                <Text style={styles.heroTitle}>{trendingMovies[0]?.title}</Text>
+                <Text style={styles.heroTitle}>{trendingMovies[0]?.title || "Featured Movie"}</Text>
                 <Text style={styles.heroGenres}>Trending Now</Text>
               </View>
-            </View>
+            </TouchableOpacity>
 
-            {/* Sections */}
             {recommendations.length > 0 &&
               renderSection("Recommended For You", recommendations, "recommend", "movie")}
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
@@ -238,21 +240,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   heroContainer: {
-    position: "relative",
     width: "100%",
-    height: 400,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
   },
+  
   heroImage: {
     width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    height: undefined,
+    aspectRatio: 16 / 9, // This ensures the full image is shown, scaled proportionally
+    resizeMode: "contain", // Prevents cropping and shows the entire image
   },
+  
   heroOverlay: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
-    zIndex: 10,
+    bottom: 0,
+    //width: "100%",
+    left: 0,
+    right: 0,
+    padding: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   heroTitle: {
     fontSize: 26,
