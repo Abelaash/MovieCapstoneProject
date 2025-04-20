@@ -97,7 +97,7 @@ export default function SearchResultScreen({ route, navigation }){
 
 
         <View style={styles.results}>
-          <Text style={[styles.searchResult, { color: 'white' }]}>
+          <Text style={[styles.searchResult, { color: 'white', fontSize:16 }]}>
             Search Results for: {searchQuery}
           </Text>
 
@@ -300,13 +300,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color:'white',
   },
   moreButtonContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   moreButton: {
     marginVertical: 2,
@@ -314,13 +314,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
     borderRadius: 15,
     backgroundColor: 'rgb(0, 175, 239)',
-    width: 100,
-    justifyContent: 'right',
+    width: 200,
+    justifyContent: 'center',
   },
   moreButtonText: {
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 15,
     color:'white',
   },
 });
