@@ -8,8 +8,7 @@ import axios from 'axios';
 import { UserContext } from './UserContext';
 import NavBar from './NavigationBar';
 import {
-  fetchMovieDetails, fetchTVDetails, fetchCastAndCrew,
-  fetchMovieTrailer
+  fetchMovieDetails, fetchTVDetails, fetchCastAndCrew
 } from '../api/api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -18,7 +17,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
   const { item, mediaType } = route.params;
   const [movieDetails, setMovieDetails] = useState(null);
   const [castCrew, setCastCrew] = useState([]);
-  const [trailer, setTrailer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
   const { userId } = useContext(UserContext);
@@ -44,9 +42,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
 
         const castData = await fetchCastAndCrew(item.id, mediaType);
         setCastCrew(castData.cast || []);
-
-        const trailerData = await fetchMovieTrailer(item.id, mediaType);
-        setTrailer(trailerData);
       } catch (error) {
         console.error('Error fetching details:', error);
       } finally {
@@ -88,7 +83,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Hero image */}
         <View style={styles.imageContainer}>
           <Animated.Image
             source={{ uri: `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` }}
@@ -97,7 +91,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
           />
         </View>
 
-        {/* Movie Info */}
         <View style={styles.infoContainer}>
           <Text style={styles.title}>{movieDetails.title || movieDetails.name}</Text>
           <Text style={styles.subtitle}>
@@ -118,27 +111,25 @@ export default function MovieDetailsScreen({ route, navigation }) {
           {watchlistMessage !== '' && (
             <Text style={styles.feedbackMessage}>{watchlistMessage}</Text>
           )}
+
+          {castCrew.length > 0 && (
+            <View style={styles.castContainer}>
+              <Text style={styles.detailsTitle}>Top Cast</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.castScroll}>
+                {castCrew.map(person =>
+                  person.profile_path && (
+                    <View key={person.id} style={styles.castCard}>
+                      <Image source={{ uri: `https://image.tmdb.org/t/p/w185${person.profile_path}` }} style={styles.castImage} />
+                      <Text style={styles.castName}>{person.name}</Text>
+                      <Text style={styles.castRole}>{person.character}</Text>
+                    </View>
+                  )
+                )}
+              </ScrollView>
+            </View>
+          )}
         </View>
 
-        {/* Trailer */}
-        {Platform.OS === 'web' && trailer && (
-          <View style={{ paddingHorizontal: 20 }}>
-            <Text style={styles.detailsTitle}>Official Trailer</Text>
-            <View style={{ height: 250 }}>
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&controls=1`}
-                title="YouTube Trailer"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </View>
-          </View>
-        )}
-
-        {/* Rating */}
         <View style={styles.ratingSection}>
           <Text style={styles.ratingTitle}>Watched it? Rate it below!</Text>
           <View style={styles.starRow}>
@@ -149,24 +140,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
             ))}
           </View>
         </View>
-
-        {/* Cast */}
-        {castCrew.length > 0 && (
-          <View style={styles.castContainer}>
-            <Text style={styles.detailsTitle}>Top Cast</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToAlignment="start" decelerationRate="fast" contentContainerStyle={styles.castScroll}>
-              {castCrew.map(person =>
-                person.profile_path && (
-                  <View key={person.id} style={styles.castCard}>
-                    <Image source={{ uri: `https://image.tmdb.org/t/p/w185${person.profile_path}` }} style={styles.castImage} />
-                    <Text style={styles.castName}>{person.name}</Text>
-                    <Text style={styles.castRole}>{person.character}</Text>
-                  </View>
-                )
-              )}
-            </ScrollView>
-          </View>
-        )}
       </ScrollView>
       <NavBar navigation={navigation} />
     </View>
@@ -187,13 +160,12 @@ const styles = StyleSheet.create({
   watchlistButton: { backgroundColor: '#FFD700', paddingVertical: 12, paddingHorizontal: 25, borderRadius: 30, width: '100%', alignItems: 'center' },
   watchlistButtonText: { fontWeight: 'bold', fontSize: 16, color: '#000' },
   feedbackMessage: { marginTop: 8, color: '#fff', textAlign: 'center', fontSize: 14 },
-  trailerLink: { color: '#1e90ff', textDecorationLine: 'underline', marginTop: 10, fontSize: 14 },
   ratingSection: { alignItems: 'center', marginVertical: 20, borderTopWidth: 1, borderTopColor: '#333', paddingTop: 20 },
   ratingTitle: { color: '#fff', fontSize: 16, marginBottom: 10 },
   starRow: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  castContainer: { paddingHorizontal: 20, marginBottom: 30 },
+  castContainer: { paddingTop: 20 },
   detailsTitle: { fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10 },
-  castScroll: { paddingRight: 20 },
+  castScroll: { paddingRight: 20, paddingLeft: 5 },
   castCard: { alignItems: 'center', marginRight: 15, width: 100 },
   castImage: { width: 80, height: 80, borderRadius: 40 },
   castName: { color: '#fff', fontSize: 13, fontWeight: '600', marginTop: 5, textAlign: 'center' },
