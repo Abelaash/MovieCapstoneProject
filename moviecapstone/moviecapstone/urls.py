@@ -25,6 +25,7 @@ urlpatterns = [
     
     path("recommend/", recommend_movies_by_ids),
     path("register/", register_user, name='register_user'),
+    path('check-username/', check_username_availability, name='check-username'),
     path("login/", login_user, name='login_user'),
     path("api/recommend/", recommend_movies_by_ids),
 

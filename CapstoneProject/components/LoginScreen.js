@@ -8,6 +8,7 @@ import {
   Image,
   StyleSheet,
   Alert,
+  Platform
 } from 'react-native';
 
 export default function LoginScreen({ navigation }) {
@@ -17,9 +18,17 @@ export default function LoginScreen({ navigation }) {
   const { userId, setUserId } = useContext(UserContext);
   const { likedMovies, setLikedMovies} = useContext(UserContext);
 
+  const showAlert = (title, message) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}\n\n${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
+
   const handleLogin = async () => {
     if (username === '' || password === '') {
-      Alert.alert('Error', 'Please fill in both fields');
+      showAlert('Error', 'Please fill in both fields');
       return;
     }
 
@@ -35,7 +44,12 @@ export default function LoginScreen({ navigation }) {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Login failed');
+        if (result.error === 'Invalid credentials') {
+          showAlert('Login Failed', 'Incorrect username or password.');
+        } else {
+          showAlert('Login Failed', result.error || 'Something went wrong.');
+        }
+        return;
       }
       
       console.log('result', result);

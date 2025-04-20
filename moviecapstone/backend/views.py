@@ -82,6 +82,17 @@ def recommend_movies_by_ids(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
+@api_view(['GET'])
+def check_username_availability(request):
+    username = request.query_params.get('username', '')
+
+    if not username:
+        return Response({'error': 'Username is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    is_taken = User.objects.filter(username=username).exists()
+    return Response({'is_taken': is_taken})
+
+
 @api_view(['POST'])
 def register_user(request):
     try:
@@ -139,7 +150,7 @@ def login_user(request):
         else:
             return Response({'error': 'Invalid credentials'}, status=401)
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=404)
+        return Response({'error': 'Username does not exist'}, status=404)
 
 
 # AI chat bot functionality
