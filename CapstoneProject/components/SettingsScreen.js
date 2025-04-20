@@ -3,6 +3,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import NavBar from './NavigationBar'; // Add this
+import Header from './Header';
+
+
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
@@ -15,13 +19,9 @@ const SettingsScreen = () => {
   );
 
   return (
+    <View style={{ flex: 1, backgroundColor: '#000' }}>
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons name="arrow-back-outline" size={24} onPress={() => navigation.goBack()} />
-        <Text style={styles.title}>Settings</Text>
-        <Ionicons name="person-circle-outline" size={32} color="#333" />
-      </View>
-
+    <Header showBack={true} title="Settings" />
       <Text style={styles.memberText}>Member since October 2023</Text>
 
       <View style={styles.section}>
@@ -48,13 +48,15 @@ const SettingsScreen = () => {
         {renderOption('Help & Feedback')}
       </View>
     </ScrollView>
+    <NavBar navigation={navigation} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     paddingTop: StatusBar.currentHeight
   },
   header: {
@@ -62,20 +64,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#F6E5C9',
+    backgroundColor: '#111',
   },
   title: {
     fontSize: 24,
     fontWeight: '600',
+    color: '#fff',
   },
   memberText: {
     fontSize: 14,
-    color: '#666',
+    color: '#ccc',
     textAlign: 'center',
     marginVertical: 8,
   },
   section: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#111',
     padding: 16,
     marginVertical: 8,
   },
@@ -83,6 +86,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#fff',
   },
   option: {
     flexDirection: 'row',
@@ -94,7 +98,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
   },
 });
 

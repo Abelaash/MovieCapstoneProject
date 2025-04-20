@@ -49,11 +49,9 @@ export default function App() {
             <Stack.Screen name="Dashboard" component={DashboardScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Search" component={SearchScreen} />
-            <Stack.Screen name="SearchResult" component={SearchResultScreen} options={{ headerShown: true,headerStyle: {
-                backgroundColor: 'black',borderBottomColor: 'black', }, headerTintColor: 'white',  }} />
-            <Stack.Screen name="Details" component={MovieDetailsScreen} options={{ headerShown: true,headerStyle: {
-                backgroundColor: 'black',borderBottomColor: 'black', }, headerTintColor: 'white',  }} />
-            <Stack.Screen name="AIChat" component={AIChatScreen} options={{ headerShown: true}} />
+            <Stack.Screen name="SearchResult" component={SearchResultScreen} />
+            <Stack.Screen name="Details" component={MovieDetailsScreen} />
+            <Stack.Screen name="AIChat" component={AIChatScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </UserProvider>

@@ -10,6 +10,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
+import NavBar from "./NavigationBar";
+import Header from './Header';
 
 
 const AIChatScreen = () => {
@@ -107,15 +109,7 @@ const AIChatScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons
-          name="person-outline" // This is the robot icon
-          size={24}
-          onPress={() => navigation.goBack()}
-          style={styles.backIcon}
-        />
-        <Text style={styles.title}>AI Chat</Text>
-      </View>
+      <Header showBack={true} title="Panda AI" />
       <Text style={styles.header1}>
         Can’t remember that movie? Need a show suggestion? Ask Panda AI
         anything, and let's roll the credits!
@@ -153,41 +147,42 @@ const AIChatScreen = () => {
           <Text style={styles.sendButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
+      <NavBar navigation={navigation} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#000',
-    width: '100%',
-    height: 50,
-    marginBottom: 20
-  },
-  backIcon: {
-    position: 'absolute',
-    left: 10,
-    color: '#f7f8fa',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#f7f8fa',
-  },
+  // header: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   backgroundColor: '#000',
+  //   width: '100%',
+  //   height: 50,
+  //   marginBottom: 20
+  // },
+  // backIcon: {
+  //   position: 'absolute',
+  //   left: 10,
+  //   color: '#f7f8fa',
+  // },
+  // title: {
+  //   fontSize: 18,
+  //   fontWeight: 'bold',
+  //   color: '#f7f8fa',
+  // },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    backgroundColor: '#000',
+    // paddingHorizontal: 20,
+    // paddingTop: 20,
   },
   header1: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 20,
-    color: '#333',
+    color: '#fff',
   },
   promptContainer: {
     flexDirection: 'row',

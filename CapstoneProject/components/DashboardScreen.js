@@ -23,6 +23,8 @@ import axios from "axios";
 import { getRecommendations } from "../api/recommend";
 import { useRoute } from "@react-navigation/native";
 import { UserContext } from "./UserContext";
+import Header from './Header';
+
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
@@ -171,6 +173,7 @@ const DashboardScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Header title="PandashBoard" />
       <ScrollView contentContainerStyle={{ paddingTop: 10, paddingBottom: 80 }}>
         {loading ? (
           <View style={styles.loading}>

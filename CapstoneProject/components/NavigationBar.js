@@ -30,7 +30,7 @@ const NavBar = ({ navigation, activeScreen }) => {
         style={styles.navItem}
       >
         <Ionicons name="robot-outline" size={28} style={getIconStyle("AIChat")} />
-        <Text style={[styles.navLabel, activeScreen === "AIChat" && styles.activeLabel]}>AI Chat</Text>
+        <Text style={[styles.navLabel, activeScreen === "AIChat" && styles.activeLabel]}>Panda AI</Text>
       </TouchableOpacity>
 
       {/* New Settings Icon */}

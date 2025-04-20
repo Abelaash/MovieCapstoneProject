@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import NavBar from './NavigationBar'; 
 import { fetchSearchResults } from '../api/api';
+import Header from './Header';
+
 
 export default function SearchScreen({ navigation }) {
   const [query, setQuery] = useState('');
@@ -33,6 +35,7 @@ export default function SearchScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.container}>
+      <Header showBack={true} title="Search" />
       <TextInput
         style={styles.searchInput}
         placeholder="Search for movies or TV shows..."
@@ -49,7 +52,7 @@ export default function SearchScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
     backgroundColor: 'black',
   },
   searchInput: {

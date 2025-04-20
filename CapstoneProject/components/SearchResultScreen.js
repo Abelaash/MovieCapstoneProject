@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { fetchMovieDetails } from '../api/api';
 import {fetchTVDetails} from '../api/api';
+
  
 const renderCard = (item, index, totalItems, navigation) => {
   const fetchDetails = async (id, mediaType) => {
@@ -89,6 +90,7 @@ export default function SearchResultScreen({ route, navigation }){
 
   return (
     <View style={{ flex: 1 }}>
+      <Header showBack={true} title="Search Result" />
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ flexGrow: 1 }}>
