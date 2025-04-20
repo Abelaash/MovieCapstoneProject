@@ -11,119 +11,96 @@ import {
   FlatList,
   Platform,
 } from "react-native";
-import { fetchUpcomingMovies, fetchTrendingMovies, fetchPopularTVShows, fetchMovieDetails, fetchTVDetails } from "../api/api";
+import {
+  fetchUpcomingMovies,
+  fetchTrendingMovies,
+  fetchPopularTVShows,
+  fetchMovieDetails,
+  fetchTVDetails,
+} from "../api/api";
 import NavBar from "./NavigationBar";
-import axios from 'axios';
+import axios from "axios";
 import { getRecommendations } from "../api/recommend";
 import { useRoute } from "@react-navigation/native";
-import { UserContext } from './UserContext'; 
+import { UserContext } from "./UserContext";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
-const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 5 : 2.5);
-
+const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 6 : 2.5);
 
 const DashboardScreen = ({ navigation }) => {
-  const { userId } = useContext(UserContext);
-  const { likedMovies} = useContext(UserContext);
+  const { userId, likedMovies } = useContext(UserContext);
   const [userName, setUserName] = useState("John");
+
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularTVShows, setPopularTVShows] = useState([]);
   const [watchlistMovie, setWatchlistMovie] = useState([]);
   const [watchlistTV, setWatchlistTV] = useState([]);
-  
-  
-
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [recommendations, setRecommendations] = useState([]);
   const route = useRoute();
-  // const { user_id } = route.params;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [upcoming, trending, popularTV, watchlistResponse] = await Promise.all([
-          fetchUpcomingMovies(),
-          fetchTrendingMovies(),
-          fetchPopularTVShows(),
-          axios.get(`http://127.0.0.1:8000/watchlist/${userId}`),
-        ]);
-  
+        const [upcoming, trending, popularTV, watchlistResponse] =
+          await Promise.all([
+            fetchUpcomingMovies(),
+            fetchTrendingMovies(),
+            fetchPopularTVShows(),
+            axios.get(`http://127.0.0.1:8000/watchlist/${userId}`),
+          ]);
+
         setUpcomingMovies(upcoming.results || []);
         setTrendingMovies(trending.results || []);
         setPopularTVShows(popularTV.results || []);
-        
-        const watchlistData = watchlistResponse.data;
-        console.log(watchlistData);
-        const movies = watchlistData.filter(item => item.media_type === "movie");
-        const tvShows = watchlistData.filter(item => item.media_type === "tv");
 
-        // Set watchlist based on media type
+        const watchlistData = watchlistResponse.data;
+        const movies = watchlistData.filter((item) => item.media_type === "movie");
+        const tvShows = watchlistData.filter((item) => item.media_type === "tv");
+
         setWatchlistMovie(movies);
         setWatchlistTV(tvShows);
-
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
-      }finally {
-        setLoading(false);
       }
     };
-    fetchData();
-  
-    
-  
-    // This is the method which receives the JSON from backend and the nfetches the details and shows it
+
     const fetchRecommendations = async () => {
       try {
-        // const likedMovieIds = route.params?.likedMovieIds;
-        // const likedMovieIds = [550, 299536, 278, 424, 157336];
-        console.log("Liked movie IDs:", likedMovies);
-        
         if (likedMovies && likedMovies.length >= 5) {
-          const data = await getRecommendations(likedMovies); // { 550: [id1, id2, id3], ... }
-          console.log("Backend response:", data);
-
-          // Flatten all recommended IDs into a unique set
+          const data = await getRecommendations(likedMovies);
           const recommendedIds = [...new Set(Object.values(data).flat())];
-          console.log("debug1:", recommendedIds);
-          // Fetch movie details for each recommended ID
           const recommendedMovies = await Promise.all(
             recommendedIds.map((id) => fetchMovieDetails(id))
           );
-  
           setRecommendations(recommendedMovies);
         }
       } catch (err) {
         console.error("Failed to fetch recommendations:", err);
       }
     };
-    fetchRecommendations();
-    
+
     const runAll = async () => {
+      setLoading(true);
       await fetchData();
       await fetchRecommendations();
-      setLoading(false); //Ensure loading stops
+      setLoading(false);
     };
-  
+
     runAll();
   }, [userId]);
 
   const fetchDetails = async (id, mediaType) => {
-    console.log("ji")
-    console.log(mediaType)
     try {
-      let details;
-      if (mediaType === "tv") {
-        console.log("tv")
-        details = await fetchTVDetails(id);
-        navigation.navigate("Details", { item: details, mediaType: "tv"});
-      } else if (mediaType === "movie") {
-        details = await fetchMovieDetails(id);
-        navigation.navigate("Details", { item: details, mediaType: "movie"});
-      }
+      const details =
+        mediaType === "tv"
+          ? await fetchTVDetails(id)
+          : await fetchMovieDetails(id);
+      navigation.navigate("Details", { item: details, mediaType });
     } catch (error) {
       console.error("Error fetching details:", error);
     }
@@ -139,11 +116,17 @@ const DashboardScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => fetchDetails(item.id, mediaType)}>
             <View style={styles.itemContainer}>
               <Image
-                source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+                source={{
+                  uri: item.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                    : "https://via.placeholder.com/120x180?text=No+Image",
+                }}
                 style={styles.posterImage}
                 resizeMode="cover"
               />
-              <Text style={styles.itemTitle}>{item.title || item.name}</Text>
+              <Text numberOfLines={1} style={styles.itemTitle}>
+                {item.title || item.name}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
@@ -153,21 +136,28 @@ const DashboardScreen = ({ navigation }) => {
     </View>
   );
 
-  const renderWatchlist = (title, data, mediaType) => (
+  const renderWatchlist = (title, data) => (
     <View style={styles.sectionContainer}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <FlatList
         data={data}
-        // keyExtractor={(item) => `${keyPrefix}-${item.movie_id}`}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() =>  fetchDetails(item.movie_id, item.mediaType)}>
+          <TouchableOpacity
+            onPress={() => fetchDetails(item.movie_id, item.mediaType)}
+          >
             <View style={styles.itemContainer}>
               <Image
-                source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+                source={{
+                  uri: item.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                    : "https://via.placeholder.com/120x180?text=No+Image",
+                }}
                 style={styles.posterImage}
                 resizeMode="cover"
               />
-              <Text style={styles.itemTitle}>{item.movie_title}</Text>
+              <Text numberOfLines={1} style={styles.itemTitle}>
+                {item.movie_title}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
@@ -178,14 +168,13 @@ const DashboardScreen = ({ navigation }) => {
   );
 
   const combinedWatchlist = [
-    ...watchlistMovie.map(item => ({ ...item, mediaType: 'movie' })),
-    ...watchlistTV.map(item => ({ ...item, mediaType: 'tv' })),
+    ...watchlistMovie.map((item) => ({ ...item, mediaType: "movie" })),
+    ...watchlistTV.map((item) => ({ ...item, mediaType: "tv" })),
   ];
-  
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         {loading ? (
           <View style={styles.loading}>
             <ActivityIndicator size="large" color="#fff" />
@@ -196,23 +185,34 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         ) : (
           <>
+            {/* Hero Image with Text Overlay */}
             <View style={styles.heroContainer}>
               <Image
-                source={{ uri: trendingMovies[0]?.backdrop_path ? `https://image.tmdb.org/t/p/original${trendingMovies[0].backdrop_path}` : "https://via.placeholder.com/800x450" }}
+                source={{
+                  uri: trendingMovies[0]?.backdrop_path
+                    ? `https://image.tmdb.org/t/p/original${trendingMovies[0].backdrop_path}`
+                    : "https://via.placeholder.com/800x450",
+                }}
                 style={styles.heroImage}
               />
+              <View style={styles.heroOverlay}>
+                <Text style={styles.heroTitle}>{trendingMovies[0]?.title}</Text>
+                <Text style={styles.heroGenres}>Trending Now</Text>
+              </View>
             </View>
+
+            {/* Sections */}
             {recommendations.length > 0 &&
               renderSection("Recommended For You", recommendations, "recommend", "movie")}
             {renderSection("Trending Now", trendingMovies, "trending", "movie")}
             {renderSection("Upcoming Movies", upcomingMovies, "upcoming", "movie")}
             {renderSection("Popular TV Shows", popularTVShows, "popular", "tv")}
-            {combinedWatchlist.length > 0 && renderWatchlist("Your Watchlist", combinedWatchlist)}
-
+            {combinedWatchlist.length > 0 &&
+              renderWatchlist("Your Watchlist", combinedWatchlist)}
           </>
         )}
       </ScrollView>
-      <NavBar navigation={navigation}/>
+      <NavBar navigation={navigation} />
     </View>
   );
 };
@@ -237,29 +237,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
-  sectionContainer: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  itemContainer: {
-    marginHorizontal: 5,
-    alignItems: "center",
-  },
-  posterImage: {
-    width: 120,
-    height: 180,
-    borderRadius: 8,
-  },
-  itemTitle: {
-    color: "#ffffff",
-    fontSize: 14,
-    textAlign: "center",
-  },
   heroContainer: {
     position: "relative",
     width: "100%",
@@ -269,6 +246,49 @@ const styles = StyleSheet.create({
   heroImage: {
     width: "100%",
     height: "100%",
+    resizeMode: "cover",
+  },
+  heroOverlay: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    zIndex: 10,
+  },
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 5,
+  },
+  heroGenres: {
+    fontSize: 14,
+    color: "#ccc",
+  },
+  sectionContainer: {
+    marginBottom: 25,
+    paddingLeft: 10,
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  itemContainer: {
+    marginRight: 10,
+    alignItems: "center",
+    width: ITEM_WIDTH,
+  },
+  posterImage: {
+    width: "100%",
+    height: ITEM_WIDTH * 1.5,
+    borderRadius: 8,
+  },
+  itemTitle: {
+    color: "#fff",
+    fontSize: 12,
+    marginTop: 5,
+    textAlign: "center",
   },
 });
 
