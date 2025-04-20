@@ -26,12 +26,10 @@ import { UserContext } from "./UserContext";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
-const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 6 : 2.5);
+const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 8 : 2.7);
 
 const DashboardScreen = ({ navigation }) => {
   const { userId, likedMovies } = useContext(UserContext);
-  const [userName, setUserName] = useState("John");
-
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularTVShows, setPopularTVShows] = useState([]);
@@ -40,7 +38,6 @@ const DashboardScreen = ({ navigation }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const route = useRoute();
 
   useEffect(() => {
@@ -244,59 +241,55 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
-  
   heroImage: {
     width: "100%",
-    height: undefined,
-    aspectRatio: 16 / 9, // This ensures the full image is shown, scaled proportionally
-    resizeMode: "contain", // Prevents cropping and shows the entire image
+    height: isWeb ? SCREEN_WIDTH * 0.3 : SCREEN_WIDTH * 0.55,
+    resizeMode: "cover",
   },
-  
   heroOverlay: {
     position: "absolute",
     bottom: 0,
-    //width: "100%",
     left: 0,
     right: 0,
-    padding: 20,
+    padding: 16,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   heroTitle: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 5,
+    marginBottom: 3,
   },
   heroGenres: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#ccc",
   },
   sectionContainer: {
-    marginBottom: 25,
+    marginBottom: 20,
     paddingLeft: 10,
   },
   sectionTitle: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   itemContainer: {
-    marginRight: 10,
+    marginRight: 8,
     alignItems: "center",
     width: ITEM_WIDTH,
   },
   posterImage: {
     width: "100%",
-    height: ITEM_WIDTH * 1.5,
-    borderRadius: 8,
+    height: ITEM_WIDTH * 1.45,
+    borderRadius: 6,
   },
   itemTitle: {
     color: "#fff",
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: 11,
+    marginTop: 4,
     textAlign: "center",
   },
 });
