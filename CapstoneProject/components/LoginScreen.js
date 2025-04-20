@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   loginBox: {
-    width: '85%',
+    width: Platform.OS === 'web' ? '50%' : '85%',
     padding: 25,
     borderRadius: 12,
     backgroundColor: '#1a1a1a',
