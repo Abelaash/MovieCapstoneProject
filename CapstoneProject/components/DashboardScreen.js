@@ -151,7 +151,7 @@ const DashboardScreen = ({ navigation }) => {
                     : "https://via.placeholder.com/120x180?text=No+Image",
                 }}
                 style={styles.posterImage}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <Text numberOfLines={1} style={styles.itemTitle}>
                 {item.movie_title}
@@ -244,11 +244,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+    overflow: 'visible'
   },
   heroImage: {
     width: "100%",
     height: isWeb ? SCREEN_WIDTH * 0.35 : SCREEN_WIDTH * 0.55,
-    resizeMode: "cover",
   },
   heroOverlay: {
     position: "absolute",

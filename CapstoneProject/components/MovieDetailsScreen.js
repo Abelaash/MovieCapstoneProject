@@ -10,6 +10,7 @@ import NavBar from './NavigationBar';
 import {
   fetchMovieDetails, fetchTVDetails, fetchCastAndCrew, fetchMovieTrailer
 } from '../api/api';
+import Header from './Header';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -76,12 +77,13 @@ export default function MovieDetailsScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+      <Header showBack={true} title="Movie Details" />
       <ScrollView>
         {/* Hero Image */}
         <Image
           source={{ uri: `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` }}
           style={styles.heroImage}
-          resizeMode="cover"
+          resizeMode="contain"
         />
 
         {/* Info Section */}
@@ -164,7 +166,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  heroImage: { width: '100%', height: SCREEN_WIDTH * 9 / 16 },
+  heroImage: { width: SCREEN_WIDTH, height: SCREEN_WIDTH * 0.4,  alignSelf: 'center' },
   contentWrapper: { padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 5 },
   subtitle: { color: '#ccc', fontSize: 14, marginBottom: 10 },
