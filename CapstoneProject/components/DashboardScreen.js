@@ -25,7 +25,6 @@ import { useRoute } from "@react-navigation/native";
 import { UserContext } from "./UserContext";
 import Header from './Header';
 
-
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const isWeb = Platform.OS === "web";
 const ITEM_WIDTH = SCREEN_WIDTH / (isWeb ? 8 : 2.7);
@@ -244,11 +243,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   heroImage: {
     width: "100%",
-    height: isWeb ? SCREEN_WIDTH * 0.3 : SCREEN_WIDTH * 0.55,
+    height: isWeb ? SCREEN_WIDTH * 0.35 : SCREEN_WIDTH * 0.55,
     resizeMode: "cover",
   },
   heroOverlay: {
@@ -260,40 +259,41 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   heroTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 3,
   },
   heroGenres: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#ccc",
   },
   sectionContainer: {
-    marginBottom: 20,
+    marginBottom: 30,
     paddingLeft: 10,
   },
   sectionTitle: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   itemContainer: {
-    marginRight: 8,
+    marginRight: 12,
     alignItems: "center",
     width: ITEM_WIDTH,
   },
   posterImage: {
     width: "100%",
     height: ITEM_WIDTH * 1.45,
-    borderRadius: 6,
+    borderRadius: 8,
   },
   itemTitle: {
     color: "#fff",
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    marginTop: 6,
     textAlign: "center",
+    fontWeight: "500",
   },
 });
 
