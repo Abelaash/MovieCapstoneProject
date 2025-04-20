@@ -53,7 +53,7 @@ MovieCapstoneProject/
 git clone https://github.com/Abelaash/MovieCapstoneProject.git
 cd MovieCapstoneProject
 ```
-### 2. 🌐 Frontend Setup (CapstoneProject folder)
+### 2. Frontend Setup (CapstoneProject folder)
 ```bash
 cd CapstoneProject
 # Install dependencies
@@ -62,7 +62,7 @@ npm install
 # Start the server
 npm start
 ```
-### 3.  🐍 Backend Setup (MovieCapstone folder)
+### 3. Backend Setup (MovieCapstone folder)
 ```bash
 cd moviecapstone
 # Install django
