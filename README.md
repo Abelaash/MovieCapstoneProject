@@ -7,7 +7,7 @@ The goal of MovieCapstoneProject is to build an AI-powered, personalized recomme
 ## ⚙️ Tech Stack
 
 - 🖥️ **Frontend**: React.js and React Native Expo  
-- 🐍 **Backend**: Django, Python  
+- ⚙️ **Backend**: Django, Python  
 - 🗃️ **Database**: MySQL with AWS RDS  
 - 🌐 **API Integration**: TMDb / IMDb APIs  
 - ☁️ **Cloud Hosting**: AWS (for backend and DB deployment)
