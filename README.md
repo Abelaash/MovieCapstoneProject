@@ -84,6 +84,8 @@ pip install pymysql
 pip install requests
 pip install pandas
 pip install scikit-learn
+pip install google-generativeai
+
 
 # Start the Django server
 python manage.py runserver
